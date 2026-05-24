@@ -7,5 +7,6 @@ This repository contains the mod source and Gradle project used for development.
 ## Notes
 
 - Minecraft: 1.20.1
-- Forge: 
-- Loader range: 
+- Forge: 47.4.20
+- Loader range: [47,)
+
