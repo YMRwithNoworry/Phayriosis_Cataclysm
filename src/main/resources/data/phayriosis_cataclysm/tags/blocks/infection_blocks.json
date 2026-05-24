@@ -1,0 +1,11 @@
+﻿{
+    "replace": false,
+    "values": [
+        "phayriosis_cataclysm:infection_core",
+        "phayriosis_cataclysm:spore_tower",
+        "phayriosis_cataclysm:deep_root",
+        "phayriosis_cataclysm:flesh_mass",
+        "phayriosis_cataclysm:tendril_cluster",
+        "phayriosis_cataclysm:hardened_carapace"
+    ]
+}

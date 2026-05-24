@@ -1,0 +1,11 @@
+﻿{
+    "replace": false,
+    "values": [
+        "phayriosis_cataclysm:hardened_carapace",
+        "minecraft:obsidian",
+        "minecraft:crying_obsidian",
+        "minecraft:bedrock",
+        "minecraft:reinforced_deepslate",
+        "minecraft:barrier"
+    ]
+}
