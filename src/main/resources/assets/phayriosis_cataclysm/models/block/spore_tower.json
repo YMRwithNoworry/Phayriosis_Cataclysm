@@ -1,3 +1,6 @@
 ﻿{
-    "parent": "minecraft:block/basalt_top"
+    "parent": "minecraft:block/cube_all",
+    "textures": {
+        "all": "phayriosis_cataclysm:block/spore_tower"
+    }
 }

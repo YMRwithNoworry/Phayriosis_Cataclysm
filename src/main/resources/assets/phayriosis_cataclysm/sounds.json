@@ -1,0 +1,38 @@
+﻿{
+    "swarm_call": {
+        "subtitle": "subtitles.phayriosis_cataclysm.swarm_call",
+        "sounds": [
+            "minecraft:mob/wither/shoot"
+        ]
+    },
+    "stage_advance": {
+        "subtitle": "subtitles.phayriosis_cataclysm.stage_advance",
+        "sounds": [
+            "minecraft:mob/wither/spawn"
+        ]
+    },
+    "spore_fire": {
+        "subtitle": "subtitles.phayriosis_cataclysm.spore_fire",
+        "sounds": [
+            "minecraft:mob/ghast/shoot"
+        ]
+    },
+    "merge_start": {
+        "subtitle": "subtitles.phayriosis_cataclysm.merge_start",
+        "sounds": [
+            "minecraft:mob/slime/big"
+        ]
+    },
+    "infection_core_pulse": {
+        "subtitle": "subtitles.phayriosis_cataclysm.infection_core_pulse",
+        "sounds": [
+            "minecraft:block/nether_portal/ambient"
+        ]
+    },
+    "carapace_activate": {
+        "subtitle": "subtitles.phayriosis_cataclysm.carapace_activate",
+        "sounds": [
+            "minecraft:block/anvil/place"
+        ]
+    }
+}
