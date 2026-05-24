@@ -1,0 +1,6 @@
+﻿{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "phayriosis_cataclysm:item/neural_fragment"
+    }
+}
