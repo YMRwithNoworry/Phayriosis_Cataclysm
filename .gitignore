@@ -1,0 +1,21 @@
+﻿# Gradle / build
+.gradle/
+build/
+out/
+
+# Run configs / local runtime
+run/
+run-data/
+
+# IntelliJ / IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS junk
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
