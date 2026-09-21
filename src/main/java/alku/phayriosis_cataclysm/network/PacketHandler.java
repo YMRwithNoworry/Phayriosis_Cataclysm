@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.network;
+package alku.phayriosis_cataclysm.network;
 
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +16,7 @@ public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(Phayriosis_cataclysm.MODID, "main"),
+            ResourceLocation.fromNamespaceAndPath(Phayriosis_cataclysm.MODID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

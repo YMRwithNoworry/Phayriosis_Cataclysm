@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.entity;
+package alku.phayriosis_cataclysm.entity;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.init.ModBlocks;

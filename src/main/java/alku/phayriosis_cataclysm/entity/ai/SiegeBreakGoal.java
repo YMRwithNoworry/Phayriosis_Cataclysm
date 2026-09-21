@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.entity.ai;
+package alku.phayriosis_cataclysm.entity.ai;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.core.InfectionStageManager;
@@ -37,6 +37,7 @@ public class SiegeBreakGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (!Config.ENABLE_SIEGE_AI.get()) return false;
         if (InfectionStageManager.getCurrentStage() < Config.SIEGE_MIN_STAGE.get()) return false;
         if (cooldown > 0) {
             cooldown--;
@@ -52,7 +53,7 @@ public class SiegeBreakGoal extends Goal {
             // Try to find a block to break
             targetBlock = findObstructingBlock(target);
             if (targetBlock != null) {
-                return true;
+                return this.mob.getRandom().nextFloat() <= Config.SIEGE_BREAK_CHANCE.get().floatValue();
             }
         }
         return false;

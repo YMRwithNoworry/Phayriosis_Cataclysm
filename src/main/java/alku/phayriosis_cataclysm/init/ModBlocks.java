@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.init;
+package alku.phayriosis_cataclysm.init;
 
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
 import alku.phayriosis_cataclysm.block.*;

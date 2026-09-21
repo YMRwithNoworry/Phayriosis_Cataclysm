@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.init;
+package alku.phayriosis_cataclysm.init;
 
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +22,6 @@ public class ModSounds {
     private static RegistryObject<SoundEvent> registerSound(String name) {
         return SOUNDS.register(name,
                 () -> SoundEvent.createVariableRangeEvent(
-                        new ResourceLocation(Phayriosis_cataclysm.MODID, name)));
+                        ResourceLocation.fromNamespaceAndPath(Phayriosis_cataclysm.MODID, name)));
     }
 }

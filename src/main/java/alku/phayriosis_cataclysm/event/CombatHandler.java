@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.event;
+package alku.phayriosis_cataclysm.event;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
@@ -9,10 +9,12 @@ import alku.phayriosis_cataclysm.entity.ai.AdaptiveCarapaceHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -37,11 +39,34 @@ public class CombatHandler {
     private static final Map<UUID, AdaptiveCarapaceHandler> carapaceHandlers = new HashMap<>();
 
     /**
+     * Optionally cancels Phayriosis Reborn's unattributed scripted damage. To
+     * players this is the instant-damage aura: it has no attacker, no attack
+     * animation, and appears as soon as a parasite has a target. Normal melee
+     * attacks still use their own damage source and are kept.
+     */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLivingHurtAura(LivingHurtEvent event) {
+        if (Config.PARASITE_AURA_DAMAGE_ENABLED.get()) return;
+
+        LivingEntity victim = event.getEntity();
+        if (victim == null || victim.level().isClientSide()) return;
+        if (PhayriosisCompat.isInfectionMob(victim)) return;
+
+        DamageSource source = event.getSource();
+        if (source.getEntity() != null || source.getDirectEntity() != null) return;
+        if (!PhayriosisCompat.isUnattributedAuraDamage(source)) return;
+
+        event.setCanceled(true);
+    }
+
+    /**
      * Handle damage events for adaptive carapace on Phayriosis entities.
      * FusedHorrorEntity handles its own carapace internally.
      */
     @SubscribeEvent
     public static void onLivingHurt(LivingHurtEvent event) {
+        if (!Config.ENABLE_ADAPTIVE_CARAPACE.get()) return;
+
         LivingEntity victim = event.getEntity();
         if (victim.level().isClientSide()) return;
 
@@ -93,15 +118,15 @@ public class CombatHandler {
 
         int stage = InfectionStageManager.getCurrentStage();
 
-        // At stage 5+, infection mobs get regeneration I
-        if (stage >= 5 && entity.tickCount % 200 == 0) {
+        // Infection mobs regenerate at the configured stage
+        if (stage >= Config.REGEN_MIN_STAGE.get() && entity.tickCount % 200 == 0) {
             if (entity.getHealth() < entity.getMaxHealth()) {
                 entity.heal(1.0f);
             }
         }
 
-        // At stage 8+, infection mobs get fire resistance (no more easy lava kills)
-        if (stage >= 8 && entity.tickCount % 400 == 0) {
+        // Infection mobs stop burning at the configured stage
+        if (stage >= Config.FIRE_RESISTANCE_MIN_STAGE.get() && entity.tickCount % 400 == 0) {
             entity.setRemainingFireTicks(0);
         }
     }

@@ -1,0 +1,18 @@
+package alku.phayriosis_cataclysm.init;
+
+import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
+import alku.phayriosis_cataclysm.effect.HemolysisMobEffect;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+
+public class ModEffects {
+
+    public static final DeferredRegister<MobEffect> MOB_EFFECTS =
+            DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, Phayriosis_cataclysm.MODID);
+
+    // Hemolysis - stacking true damage inflicted by PHA creatures
+    public static final RegistryObject<MobEffect> HEMOLYSIS =
+            MOB_EFFECTS.register("hemolysis", HemolysisMobEffect::new);
+}

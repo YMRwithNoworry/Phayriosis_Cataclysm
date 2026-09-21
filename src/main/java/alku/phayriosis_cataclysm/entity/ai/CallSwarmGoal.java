@@ -1,15 +1,14 @@
-﻿package alku.phayriosis_cataclysm.entity.ai;
+package alku.phayriosis_cataclysm.entity.ai;
 
 import alku.phayriosis_cataclysm.Config;
+import alku.phayriosis_cataclysm.core.InfectionStageManager;
 import alku.phayriosis_cataclysm.core.PhayriosisCompat;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.EnumSet;
@@ -19,8 +18,9 @@ import java.util.List;
  * Call Swarm Goal - when an infection mob detects a player, it emits
  * a screech that alerts all nearby infection mobs to target that player
  * and grants them Speed II for a short duration.
- * 
- * Creates terrifying "horde rush" moments.
+ *
+ * Creates terrifying "horde rush" moments. This can be disabled with the
+ * enableCallSwarm config and is gated by swarmMinStage.
  */
 public class CallSwarmGoal extends Goal {
 
@@ -35,6 +35,9 @@ public class CallSwarmGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (!Config.ENABLE_CALL_SWARM.get()) return false;
+        if (InfectionStageManager.getCurrentStage() < Config.SWARM_MIN_STAGE.get()) return false;
+
         if (cooldownTimer > 0) {
             cooldownTimer--;
             return false;
@@ -42,12 +45,13 @@ public class CallSwarmGoal extends Goal {
 
         // Trigger when the mob has a target (player) and is freshly aggravated
         LivingEntity target = mob.getTarget();
-        if (target == null || !(target instanceof Player)) return false;
+        if (target == null || !(target instanceof Player)) {
+            hasCalled = false;
+            return false;
+        }
 
         // Only call once per engagement
-        if (hasCalled) return false;
-
-        return true;
+        return !hasCalled;
     }
 
     @Override
@@ -64,7 +68,7 @@ public class CallSwarmGoal extends Goal {
 
     @Override
     public void stop() {
-        // Reset hasCalled after a longer period
+        // hasCalled is reset naturally when the mob loses its player target.
     }
 
     public void resetCallFlag() {
@@ -98,7 +102,6 @@ public class CallSwarmGoal extends Goal {
                     MobEffects.MOVEMENT_SPEED, speedDuration, 1, false, true));
         }
 
-        // Play the screech sound (we reference it by our sound event)
-        // The actual sound is played via the event handler in CombatHandler
+        // The screech sound is intentionally left to an optional client/event layer.
     }
 }

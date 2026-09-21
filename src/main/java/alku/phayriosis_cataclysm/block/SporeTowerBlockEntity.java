@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.block;
+package alku.phayriosis_cataclysm.block;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.core.InfectionStageManager;
@@ -33,6 +33,8 @@ public class SporeTowerBlockEntity extends BlockEntity {
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, SporeTowerBlockEntity be) {
+        if (!Config.ENABLE_SPORE_TOWERS.get()) return;
+
         // Only fire at sufficient stage
         if (InfectionStageManager.getCurrentStage() < Config.SPORE_TOWER_MIN_STAGE.get()) return;
 

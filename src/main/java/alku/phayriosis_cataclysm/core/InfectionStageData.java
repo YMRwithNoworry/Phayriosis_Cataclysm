@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.core;
+package alku.phayriosis_cataclysm.core;
 
 import alku.phayriosis_cataclysm.Config;
 import net.minecraft.nbt.CompoundTag;
@@ -22,9 +22,8 @@ public class InfectionStageData extends SavedData {
 
     public static InfectionStageData load(CompoundTag tag) {
         InfectionStageData data = new InfectionStageData();
-        data.biomass = tag.getDouble("Biomass");
-        data.stage = tag.getInt("Stage");
-        if (data.stage < 1) data.stage = 1;
+        data.biomass = Math.max(0.0, tag.getDouble("Biomass"));
+        data.stage = data.calculateStage();
         return data;
     }
 
@@ -77,15 +76,34 @@ public class InfectionStageData extends SavedData {
 
     private int calculateStage() {
         double[] thresholds = Config.getStageThresholds();
-        int s = 1;
-        for (int i = 0; i < thresholds.length && i < Config.MAX_STAGE.get(); i++) {
-            if (this.biomass >= thresholds[i]) {
-                s = i + 1;
+        int maxStage = Math.max(1, Math.min(Config.MAX_STAGE.get(), thresholds.length));
+        int calculated = 1;
+
+        for (int stageIndex = 1; stageIndex < maxStage; stageIndex++) {
+            if (this.biomass >= thresholds[stageIndex]) {
+                calculated = stageIndex + 1;
             } else {
                 break;
             }
         }
-        return Math.min(s, Config.MAX_STAGE.get());
+
+        return calculated;
+    }
+
+    /**
+     * Force the stored stage to a value. Mainly useful for reload/testing.
+     */
+    public void setStage(int stage) {
+        int maxStage = Math.max(1, Math.min(Config.MAX_STAGE.get(), 10));
+        int clamped = Math.max(1, Math.min(stage, maxStage));
+        double[] thresholds = Config.getStageThresholds();
+        this.biomass = thresholds[Math.min(clamped - 1, thresholds.length - 1)];
+
+        if (clamped != this.stage) {
+            this.stage = clamped;
+            this.dirty = true;
+        }
+        setDirty();
     }
 
     /**

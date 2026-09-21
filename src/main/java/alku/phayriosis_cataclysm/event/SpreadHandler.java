@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.event;
+package alku.phayriosis_cataclysm.event;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
@@ -8,6 +8,8 @@ import alku.phayriosis_cataclysm.init.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -17,8 +19,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
+import java.util.Set;
 
 /**
  * Handles the 3D infection spread mechanics:
@@ -38,15 +41,15 @@ public class SpreadHandler {
     // Track root counts per chunk for the deep root network boost
     private static final Map<Long, Integer> rootCountsPerChunk = new HashMap<>();
     private static int scanTimer = 0;
-    private static final Random RANDOM = new Random();
+    private static final RandomSource RANDOM = RandomSource.create();
 
     /**
      * Periodic tick to handle infection spread and water contamination.
      */
     @SubscribeEvent
-    public static void onWorldTick(TickEvent.WorldTickEvent event) {
+    public static void onWorldTick(TickEvent.LevelTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (!(event.world instanceof ServerLevel level)) return;
+        if (!(event.level instanceof ServerLevel level)) return;
 
         // Only process overworld (but could be expanded)
         if (level.dimension() != Level.OVERWORLD) return;
@@ -56,13 +59,11 @@ public class SpreadHandler {
         scanTimer = 0;
 
         int stage = InfectionStageManager.getCurrentStage();
-        if (stage < 2) return; // No spread at stage 1
+        if (stage < Config.SPREAD_MIN_STAGE.get()) return;
 
         // Scan loaded chunks for infection spread opportunities
-        for (ServerLevel loadedLevel : level.getServer().getAllLevels()) {
-            for (ChunkPos chunk : getLoadedChunks(loadedLevel)) {
-                processChunkSpread(loadedLevel, chunk, stage);
-            }
+        for (ChunkPos chunk : getLoadedChunks(level)) {
+            processChunkSpread(level, chunk, stage);
         }
     }
 
@@ -98,20 +99,25 @@ public class SpreadHandler {
         int rootCount = rootCountsPerChunk.getOrDefault(chunkKey, 0);
         boolean boosted = rootCount >= Config.ROOTS_PER_CHUNK_FOR_BOOST.get();
 
-        // Spread to random neighbor
-        Direction dir = Direction.getRandom(RANDOM);
-        BlockPos neighbor = pos.relative(dir);
+        // A boosted chunk gets several independent neighbour attempts.
+        int attempts = boosted
+                ? Math.max(1, (int) Math.round(Config.SURFACE_SPREAD_BOOST.get()))
+                : 1;
 
-        if (!level.isLoaded(neighbor)) return;
-        BlockState neighborState = level.getBlockState(neighbor);
+        for (int attempt = 0; attempt < attempts; attempt++) {
+            BlockPos neighbor = pos.relative(Direction.getRandom(RANDOM));
+            if (!level.isLoaded(neighbor)) continue;
 
-        if (isSpreadable(neighborState)) {
-            // Boosted chunks spread faster
-            if (boosted && RANDOM.nextFloat() > 0.5f) return; // already "used" the boost
+            BlockState neighborState = level.getBlockState(neighbor);
+            if (!isSpreadable(neighborState)) continue;
 
             BlockState replacement = getSpreadBlock(neighborState, level, neighbor);
             if (replacement != null) {
                 level.setBlock(neighbor, replacement, 3);
+                if (replacement.is(ModBlocks.DEEP_ROOT.get())) {
+                    onRootPlaced(level, neighbor);
+                }
+                return;
             }
         }
     }
@@ -162,18 +168,23 @@ public class SpreadHandler {
     }
 
     /**
-     * Get a set of loaded chunk positions for a level.
-     * This is a simplified version; in production you'd iterate more efficiently.
+     * Get a set of loaded chunk positions around players in this level.
+     * This is deliberately a small, bounded sample so the five-second scan
+     * never walks the entire world.
      */
     private static Iterable<ChunkPos> getLoadedChunks(ServerLevel level) {
-        // We'll just sample from the forced chunks and entity chunks
-        // For efficiency, we limit to a manageable set
-        java.util.Set<ChunkPos> chunks = new java.util.HashSet<>();
-        // Get chunks around loaded block entities (a good proxy for "active" chunks)
-        level.getBlockEntityTicks().forEach(info -> {
-            ChunkPos cp = new ChunkPos(info.getPos());
-            chunks.add(cp);
-        });
+        Set<ChunkPos> chunks = new HashSet<>();
+        int radius = 4;
+
+        for (ServerPlayer player : level.players()) {
+            ChunkPos center = player.chunkPosition();
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    chunks.add(new ChunkPos(center.x + dx, center.z + dz));
+                }
+            }
+        }
+
         return chunks;
     }
 

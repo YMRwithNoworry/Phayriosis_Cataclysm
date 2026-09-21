@@ -116,11 +116,10 @@ repositories {
     // Put repositories for dependencies here
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
-    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    // Local Phayriosis Reborn dependency jar lives in ./libs.
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
@@ -137,13 +136,10 @@ dependencies {
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
 
-    // Phayriosis Reborn dependency
-    flatDir {
-        dir 'libs'
-    }
-
-    // Phayriosis Reborn dependency
-    implementation fg.deobf("blank:phayriosisreborn")
+    // Phayriosis Reborn dependency (provided by libs/phayriosisreborn.jar).
+    // A plain file dependency is sufficient for this addon because the Java
+    // sources only detect its entities/blocks by registry name.
+    implementation files('libs/phayriosisreborn.jar')
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

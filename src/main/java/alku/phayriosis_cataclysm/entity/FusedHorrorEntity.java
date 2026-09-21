@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.entity;
+package alku.phayriosis_cataclysm.entity;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.entity.ai.AdaptiveCarapaceHandler;
@@ -14,6 +14,8 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -45,7 +47,9 @@ public class FusedHorrorEntity extends Monster {
                 .add(Attributes.ATTACK_DAMAGE, 12.0)
                 .add(Attributes.ARMOR, 8.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.6)
-                .add(Attributes.FOLLOW_RANGE, 32.0);
+                // Targeting range: every PHA creature is normalised to Config.PHA_FOLLOW_RANGE
+                // when it joins the world; this is the pre-join default and should match it.
+                .add(Attributes.FOLLOW_RANGE, 64.0);
     }
 
     @Override
@@ -75,7 +79,9 @@ public class FusedHorrorEntity extends Monster {
      */
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (!this.level().isClientSide() && InfectionStageManager_getCurrentStage() >= Config.CARAPACE_MIN_STAGE.get()) {
+        if (!this.level().isClientSide()
+                && Config.ENABLE_ADAPTIVE_CARAPACE.get()
+                && InfectionStageManager_getCurrentStage() >= Config.CARAPACE_MIN_STAGE.get()) {
             amount = carapaceHandler.processDamage(this, source, amount);
         }
         return super.hurt(source, amount);

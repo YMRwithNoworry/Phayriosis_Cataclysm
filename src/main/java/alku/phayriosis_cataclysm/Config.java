@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm;
+package alku.phayriosis_cataclysm;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -17,6 +17,18 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue PASSIVE_BIOMASS_PER_TICK = BUILDER
             .comment("Passive biomass gained per tick interval")
             .defineInRange("passiveBiomassPerTick", 0.05, 0.0, 10.0);
+
+    public static final ForgeConfigSpec.IntValue SPREAD_MIN_STAGE = BUILDER
+            .comment("Minimum stage for surface infection spread")
+            .defineInRange("spreadMinStage", 2, 1, 10);
+
+    public static final ForgeConfigSpec.IntValue REGEN_MIN_STAGE = BUILDER
+            .comment("Minimum stage for infection mobs to regenerate")
+            .defineInRange("regenMinStage", 5, 1, 10);
+
+    public static final ForgeConfigSpec.IntValue FIRE_RESISTANCE_MIN_STAGE = BUILDER
+            .comment("Minimum stage for infection mobs to resist fire")
+            .defineInRange("fireResistanceMinStage", 8, 1, 10);
 
     // ========== Biomass Sources ==========
     public static final ForgeConfigSpec.DoubleValue BIOMASS_PER_VANILLA_KILL = BUILDER
@@ -37,25 +49,29 @@ public class Config {
 
     // ========== Stage Thresholds ==========
     public static final ForgeConfigSpec.DoubleValue STAGE_2_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 2").defineInRange("stage2Threshold", 50.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 2").defineInRange("stage2Threshold", 50.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_3_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 3").defineInRange("stage3Threshold", 150.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 3").defineInRange("stage3Threshold", 150.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_4_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 4").defineInRange("stage4Threshold", 400.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 4").defineInRange("stage4Threshold", 400.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_5_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 5").defineInRange("stage5Threshold", 800.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 5").defineInRange("stage5Threshold", 800.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_6_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 6").defineInRange("stage6Threshold", 1500.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 6").defineInRange("stage6Threshold", 1500.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_7_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 7").defineInRange("stage7Threshold", 3000.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 7").defineInRange("stage7Threshold", 3000.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_8_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 8").defineInRange("stage8Threshold", 6000.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 8").defineInRange("stage8Threshold", 6000.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_9_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 9").defineInRange("stage9Threshold", 12000.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 9").defineInRange("stage9Threshold", 12000.0, 0.0, 100000.0);
     public static final ForgeConfigSpec.DoubleValue STAGE_10_THRESHOLD = BUILDER
-            .comment("Biomass needed to reach stage 10").defineInRange("stage10Threshold", 25000.0, 0.0, 10000.0);
+            .comment("Biomass needed to reach stage 10").defineInRange("stage10Threshold", 25000.0, 0.0, 100000.0);
 
     // ========== Spore Tower ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_SPORE_TOWERS = BUILDER
+            .comment("Whether spore towers can fire at all")
+            .define("enableSporeTowers", true);
+
     public static final ForgeConfigSpec.IntValue SPORE_TOWER_RANGE = BUILDER
             .comment("Range in blocks for spore tower to target uninfected areas")
             .defineInRange("sporeTowerRange", 48, 8, 128);
@@ -67,7 +83,7 @@ public class Config {
             .comment("Radius of infection when spore projectile lands").defineInRange("sporeInfectRadius", 2, 1, 5);
 
     public static final ForgeConfigSpec.IntValue SPORE_TOWER_MIN_STAGE = BUILDER
-            .comment("Minimum stage for spore towers to spawn").defineInRange("sporeTowerMinStage", 3, 1, 10);
+            .comment("Minimum stage for spore towers to fire").defineInRange("sporeTowerMinStage", 3, 1, 10);
 
     // ========== Deep Root Network ==========
     public static final ForgeConfigSpec.IntValue ROOT_SPREAD_DEPTH = BUILDER
@@ -88,6 +104,10 @@ public class Config {
             .comment("Chance per tick for contaminated water to spread along flow").defineInRange("waterSpreadSpeed", 0.1, 0.01, 1.0);
 
     // ========== Siege AI ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_SIEGE_AI = BUILDER
+            .comment("Whether infection mobs can break blocks")
+            .define("enableSiegeAI", true);
+
     public static final ForgeConfigSpec.DoubleValue SIEGE_BREAK_CHANCE = BUILDER
             .comment("Chance per tick to start breaking a block when pathfinding fails")
             .defineInRange("siegeBreakChance", 0.05, 0.001, 1.0);
@@ -100,6 +120,10 @@ public class Config {
             .comment("Minimum stage for siege AI to activate").defineInRange("siegeMinStage", 4, 1, 10);
 
     // ========== Merge AI ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_MERGING = BUILDER
+            .comment("Whether larvae can merge into Fused Horrors")
+            .define("enableMerging", true);
+
     public static final ForgeConfigSpec.DoubleValue MERGE_RADIUS = BUILDER
             .comment("Radius to search for merge partners").defineInRange("mergeRadius", 5.0, 1.0, 16.0);
 
@@ -110,6 +134,14 @@ public class Config {
             .comment("Minimum stage for merging to occur").defineInRange("mergeMinStage", 2, 1, 10);
 
     // ========== Call Swarm ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_CALL_SWARM = BUILDER
+            .comment("Whether infection mobs alert nearby parasites when they acquire a player target")
+            .define("enableCallSwarm", true);
+
+    public static final ForgeConfigSpec.IntValue SWARM_MIN_STAGE = BUILDER
+            .comment("Minimum stage for Call Swarm to activate")
+            .defineInRange("swarmMinStage", 2, 1, 10);
+
     public static final ForgeConfigSpec.IntValue SWARM_ALERT_RADIUS = BUILDER
             .comment("Radius in blocks for swarm call to alert nearby mobs").defineInRange("swarmAlertRadius", 32, 8, 128);
 
@@ -119,7 +151,20 @@ public class Config {
     public static final ForgeConfigSpec.IntValue SWARM_COOLDOWN = BUILDER
             .comment("Ticks between swarm calls").defineInRange("swarmCooldown", 600, 100, 3600);
 
+    // ========== Targeting Range ==========
+    public static final ForgeConfigSpec.DoubleValue PHA_FOLLOW_RANGE = BUILDER
+            .comment("Targeting/sight range in blocks of every PHA creature (the FOLLOW_RANGE attribute).",
+                    "Phayriosis Reborn never assigns FOLLOW_RANGE, so its units would otherwise run on the",
+                    "vanilla default of 16 blocks; this value is applied to all infection mobs when they",
+                    "enter the world (and re-applied on chunk load), so it also overrides the addon's own",
+                    "mobs. Existing mobs keep their old range until they reload.")
+            .defineInRange("phaFollowRange", 64.0, 8.0, 256.0);
+
     // ========== Adaptive Carapace ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_ADAPTIVE_CARAPACE = BUILDER
+            .comment("Whether high-stage infection mobs can adapt to repeated damage types")
+            .define("enableAdaptiveCarapace", true);
+
     public static final ForgeConfigSpec.IntValue CARAPACE_HITS_TO_TRIGGER = BUILDER
             .comment("Consecutive same-type hits before carapace activates").defineInRange("carapaceHitsToTrigger", 3, 2, 10);
 
@@ -148,15 +193,64 @@ public class Config {
     public static final ForgeConfigSpec.DoubleValue MERGED_ENTITY_DAMAGE_MULTIPLIER = BUILDER
             .comment("Damage multiplier for merged entities vs base").defineInRange("mergedEntityDamageMultiplier", 2.0, 1.0, 10.0);
 
+    // ========== Hemolysis ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_HEMOLYSIS = BUILDER
+            .comment("Whether PHA creatures can inflict Hemolysis (溶血) on whatever they keep attacking")
+            .define("enableHemolysis", true);
+
+    public static final ForgeConfigSpec.IntValue HEMOLYSIS_HITS_TO_TRIGGER = BUILDER
+            .comment("How many consecutive hits a PHA creature must land on the same target to inflict Hemolysis")
+            .defineInRange("hemolysisHitsToTrigger", 5, 1, 100);
+
+    public static final ForgeConfigSpec.DoubleValue HEMOLYSIS_DAMAGE_RATIO_THRESHOLD = BUILDER
+            .comment("Hemolysis is only inflicted when the damage those hits actually dealt is below this",
+                    "multiple of the attacker's attack power (4.0 = 400%).",
+                    "Targets that mitigate the hits (armour, Resistance, absorption, shields) are the ones",
+                    "that end up bleeding; fragile targets simply take the damage and are spared.")
+            .defineInRange("hemolysisDamageRatioThreshold", 4.0, 0.0, 100.0);
+
+    public static final ForgeConfigSpec.IntValue HEMOLYSIS_DURATION = BUILDER
+            .comment("Base duration of Hemolysis in ticks (20 ticks = 1 second)")
+            .defineInRange("hemolysisDuration", 600, 20, 72000);
+
+    public static final ForgeConfigSpec.DoubleValue HEMOLYSIS_DAMAGE_PER_SECOND = BUILDER
+            .comment("True damage dealt every second, as a fraction of the victim's max health, per layer",
+                    "(0.02 = 2% per layer). The damage is multiplied by the current number of layers.")
+            .defineInRange("hemolysisDamagePerSecond", 0.02, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.IntValue HEMOLYSIS_MAX_LAYERS = BUILDER
+            .comment("Maximum number of Hemolysis layers a single target can accumulate")
+            .defineInRange("hemolysisMaxLayers", 10, 1, 127);
+
+    public static final ForgeConfigSpec.IntValue HEMOLYSIS_STREAK_WINDOW = BUILDER
+            .comment("Ticks allowed between two hits before the attack streak resets")
+            .defineInRange("hemolysisStreakWindow", 200, 1, 6000);
+
+    public static final ForgeConfigSpec.BooleanValue HEMOLYSIS_COUNT_SCRIPTED_DAMAGE = BUILDER
+            .comment("Also treat Phayriosis Reborn's unattributed scripted damage (the instant contact",
+                    "aura used by converted/advanced/perennial units) as an attack.",
+                    "Disabled by default because that aura ticks far more often than a real swing does.")
+            .define("hemolysisCountScriptedDamage", false);
+
+    // ========== Phayriosis Reborn Compatibility ==========
+    public static final ForgeConfigSpec.BooleanValue PARASITE_AURA_DAMAGE_ENABLED = BUILDER
+            .comment("Allows Phayriosis Reborn parasites to deal unattributed scripted contact damage",
+                    "('wasconverted' and 'toomuchforeignblood' - the instant-damage aura reported by players).",
+                    "Set to false to disable it.")
+            .define("parasiteAuraDamageEnabled", true);
+
     // ========== Debug ==========
     public static final ForgeConfigSpec.BooleanValue DEBUG_LOGGING = BUILDER
             .comment("Enable debug logging").define("debugLogging", false);
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
-    // Cached stage thresholds array
+    /**
+     * Stage thresholds, normalised so a malformed config cannot make later stages
+     * unreachable (or make stage progression run backwards).
+     */
     public static double[] getStageThresholds() {
-        return new double[]{
+        double[] thresholds = {
                 0, // stage 1 starts at 0
                 STAGE_2_THRESHOLD.get(),
                 STAGE_3_THRESHOLD.get(),
@@ -168,5 +262,13 @@ public class Config {
                 STAGE_9_THRESHOLD.get(),
                 STAGE_10_THRESHOLD.get()
         };
+
+        for (int i = 1; i < thresholds.length; i++) {
+            if (thresholds[i] < thresholds[i - 1]) {
+                thresholds[i] = thresholds[i - 1];
+            }
+        }
+
+        return thresholds;
     }
 }

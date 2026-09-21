@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.entity.ai;
+package alku.phayriosis_cataclysm.entity.ai;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.core.InfectionStageManager;
@@ -15,8 +15,9 @@ import java.util.List;
 /**
  * Merge Goal - when two Larvae are close together and not being attacked,
  * they stop moving and merge into a FusedHorror after a charge time.
- * 
+ *
  * This creates a snowball effect if players don't clear infection mobs quickly.
+ * Server operators can disable the whole mechanic with the enableMerging config.
  */
 public class MergeGoal extends Goal {
 
@@ -32,6 +33,7 @@ public class MergeGoal extends Goal {
 
     @Override
     public boolean canUse() {
+        if (!Config.ENABLE_MERGING.get()) return false;
         if (!larva.canMerge()) return false;
         if (InfectionStageManager.getCurrentStage() < Config.MERGE_MIN_STAGE.get()) return false;
 
@@ -42,6 +44,9 @@ public class MergeGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
+        if (!Config.ENABLE_MERGING.get()) return false;
+        if (InfectionStageManager.getCurrentStage() < Config.MERGE_MIN_STAGE.get()) return false;
+
         return isMerging && mergePartner != null &&
                 mergePartner.isAlive() && !mergePartner.isDeadOrDying() &&
                 larva.isAlive() && !larva.isDeadOrDying() &&
@@ -64,18 +69,23 @@ public class MergeGoal extends Goal {
 
     @Override
     public void stop() {
-        isMerging = false;
-        larva.setMerging(false);
+        if (larva.isAlive()) {
+            larva.setMerging(false);
+            larva.setMergeCooldown(60);
+        }
+
         if (mergePartner != null && mergePartner.isAlive()) {
             mergePartner.setMerging(false);
             mergePartner.setMergeCooldown(100); // cooldown before this larva can try again
         }
-        larva.setMergeCooldown(60);
+
+        isMerging = false;
+        mergePartner = null;
     }
 
     @Override
     public void tick() {
-        if (mergePartner == null || !mergePartner.isAlive()) {
+        if (!isMerging || mergePartner == null || !mergePartner.isAlive()) {
             isMerging = false;
             return;
         }
@@ -101,12 +111,21 @@ public class MergeGoal extends Goal {
     }
 
     private void performMerge() {
+        if (!isMerging || mergePartner == null) return;
         if (!(larva.level() instanceof ServerLevel serverLevel)) return;
+
+        isMerging = false;
+        larva.setMerging(false);
+        mergePartner.setMerging(false);
 
         // Calculate midpoint
         double midX = (larva.getX() + mergePartner.getX()) / 2.0;
         double midY = (larva.getY() + mergePartner.getY()) / 2.0;
         double midZ = (larva.getZ() + mergePartner.getZ()) / 2.0;
+
+        // Capture rotation before either larva is discarded.
+        float spawnYaw = larva.getYRot();
+        float spawnPitch = larva.getXRot();
 
         // Remove both larvae
         mergePartner.discard();
@@ -115,7 +134,7 @@ public class MergeGoal extends Goal {
         // Spawn FusedHorror at midpoint
         FusedHorrorEntity horror = ModEntities.FUSED_HORROR.get().create(serverLevel);
         if (horror != null) {
-            horror.setPos(midX, midY, midZ);
+            horror.moveTo(midX, midY, midZ, spawnYaw, spawnPitch);
 
             // Apply configured multipliers to attributes
             double hpMult = Config.MERGED_ENTITY_HP_MULTIPLIER.get();
@@ -133,15 +152,18 @@ public class MergeGoal extends Goal {
 
             serverLevel.addFreshEntity(horror);
         }
-
-        isMerging = false;
     }
 
     private LarvaEntity findMergePartner() {
         List<LarvaEntity> nearby = larva.level().getEntitiesOfClass(
                 LarvaEntity.class,
                 larva.getBoundingBox().inflate(Config.MERGE_RADIUS.get()),
-                other -> other != larva && other.canMerge() && !other.isMerging()
+                other -> other != larva
+                        && other.canMerge()
+                        && !other.isMerging()
+                        // Only the larva with the lower UUID initiates, preventing both
+                        // entities from running a merge at the same time.
+                        && other.getUUID().compareTo(larva.getUUID()) > 0
         );
 
         if (nearby.isEmpty()) return null;

@@ -1,8 +1,11 @@
-﻿package alku.phayriosis_cataclysm.entity.ai;
+package alku.phayriosis_cataclysm.entity.ai;
 
 import alku.phayriosis_cataclysm.Config;
+import alku.phayriosis_cataclysm.core.ModDamageTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -26,11 +29,15 @@ public class AdaptiveCarapaceHandler {
      * Returns the modified damage amount.
      */
     public float processDamage(LivingEntity entity, DamageSource source, float amount) {
+        // Hemolysis is unresistable true damage: the carapace may neither soften it nor
+        // treat its ticks as "hits" that would set up an adaptation.
+        if (source.is(ModDamageTypes.HEMOLYSIS)) return amount;
+
         String category = categorizeDamage(source);
 
         if (resistantTo.equals(category) && active) {
             // Apply damage reduction
-            amount *= (1.0f - (float) Config.CARAPACE_DAMAGE_REDUCTION.get());
+            amount *= (1.0f - Config.CARAPACE_DAMAGE_REDUCTION.get().floatValue());
             return amount;
         }
 
@@ -80,11 +87,11 @@ public class AdaptiveCarapaceHandler {
      * Categorize damage into broad types for carapace tracking.
      */
     private String categorizeDamage(DamageSource source) {
-        if (source.isProjectile()) return "projectile";
-        if (source.isExplosion()) return "explosion";
-        if (source.isFire()) return "fire";
-        if (source.isMagic()) return "magic";
-        if (source.is(DamageSource.FREEZE)) return "freeze";
+        if (source.is(DamageTypeTags.IS_PROJECTILE)) return "projectile";
+        if (source.is(DamageTypeTags.IS_EXPLOSION)) return "explosion";
+        if (source.is(DamageTypeTags.IS_FIRE)) return "fire";
+        if (source.is(DamageTypes.MAGIC) || source.is(DamageTypes.INDIRECT_MAGIC)) return "magic";
+        if (source.is(DamageTypeTags.IS_FREEZING)) return "freeze";
 
         // Melee is the default "contact" damage
         return "melee";

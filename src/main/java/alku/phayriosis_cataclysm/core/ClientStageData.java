@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.core;
+package alku.phayriosis_cataclysm.core;
 
 /**
  * Client-side holder for infection stage data.

@@ -1,13 +1,13 @@
-﻿package alku.phayriosis_cataclysm.block;
+package alku.phayriosis_cataclysm.block;
 
 import alku.phayriosis_cataclysm.Config;
+import alku.phayriosis_cataclysm.event.SpreadHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.Random;
 
 /**
  * Deep Root - underground infection block that spreads downward through
@@ -15,8 +15,6 @@ import java.util.Random;
  * When enough roots accumulate in a chunk, surface infection spread is boosted.
  */
 public class DeepRootBlock extends Block {
-
-    private static final Random RANDOM = new Random();
 
     public DeepRootBlock(Properties props) {
         super(props);
@@ -28,7 +26,7 @@ public class DeepRootBlock extends Block {
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         // Spread downward
         if (random.nextFloat() > 0.15f) return; // 15% chance per tick
 
@@ -49,6 +47,7 @@ public class DeepRootBlock extends Block {
 
             if (isConvertible(target)) {
                 level.setBlock(candidate, this.defaultBlockState(), 3);
+                SpreadHandler.onRootPlaced(level, candidate);
                 return; // one spread per tick
             }
         }

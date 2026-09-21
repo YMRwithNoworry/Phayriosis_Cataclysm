@@ -1,30 +1,44 @@
-﻿package alku.phayriosis_cataclysm.core;
+package alku.phayriosis_cataclysm.core;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.List;
 import java.util.Set;
 
 /**
  * Compatibility layer for detecting Phayriosis mod entities and blocks.
  * Uses registry name matching since we don't have compile-time dependency on Phayriosis.
+ *
+ * <p>"PHA creatures" are the infection mobs of this modpack: everything registered
+ * under the {@code phayriosisreborn} namespace (Phayriosis Reborn's converted,
+ * advanced, elite, perennial and primordial units) plus this addon's own
+ * {@code phayriosis_cataclysm} mobs. {@link #isInfectionMob(Entity)} is the single
+ * definition every feature uses.</p>
  */
 public class PhayriosisCompat {
 
     private static final String PHAYRIOSIS_PREFIX = "phayriosisreborn:";
+    private static final String CATACLYSM_PREFIX = "phayriosis_cataclysm:";
 
-    // Known Phayriosis entity patterns
-    private static final Set<String> INFECTED_ENTITY_PATTERNS = Set.of(
-            "converted_", "primal_", "carrier", "bulb", "nucleus",
-            "seeder", "patroller", "phayrector", "nestwarden",
-            "scent_", "victim", "bomb", "worm_"
-    );
+    private static final ResourceKey<DamageType> PHAYRIOSIS_WAS_CONVERTED =
+            ResourceKey.create(Registries.DAMAGE_TYPE,
+                    ResourceLocation.fromNamespaceAndPath("phayriosisreborn", "wasconverted"));
+    private static final ResourceKey<DamageType> PHAYRIOSIS_FOREIGN_BLOOD =
+            ResourceKey.create(Registries.DAMAGE_TYPE,
+                    ResourceLocation.fromNamespaceAndPath("phayriosisreborn", "toomuchforeignblood"));
 
     // Farm animals that give bonus biomass
     private static final Set<String> FARM_ANIMALS = Set.of(
@@ -37,28 +51,25 @@ public class PhayriosisCompat {
      * Check if an entity is from the Phayriosis mod (infected/parasite entity).
      */
     public static boolean isPhayriosisEntity(Entity entity) {
-        if (entity == null) return false;
-        String registryName = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-        return registryName.startsWith(PHAYRIOSIS_PREFIX);
+        String registryName = getEntityRegistryName(entity);
+        return registryName != null && registryName.startsWith(PHAYRIOSIS_PREFIX);
     }
 
     /**
      * Check if an entity type is from Phayriosis.
      */
     public static boolean isPhayriosisEntityType(EntityType<?> type) {
-        if (type == null) return false;
-        String registryName = ForgeRegistries.ENTITY_TYPES.getKey(type).toString();
-        return registryName.startsWith(PHAYRIOSIS_PREFIX);
+        String registryName = getEntityRegistryName(type);
+        return registryName != null && registryName.startsWith(PHAYRIOSIS_PREFIX);
     }
 
     /**
      * Check if an entity is an infection mob (from Phayriosis or our addon).
      */
     public static boolean isInfectionMob(Entity entity) {
-        if (entity == null) return false;
-        if (isPhayriosisEntity(entity)) return true;
-        String registryName = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-        return registryName.startsWith("phayriosis_cataclysm:");
+        String registryName = getEntityRegistryName(entity);
+        return registryName != null
+                && (registryName.startsWith(PHAYRIOSIS_PREFIX) || registryName.startsWith(CATACLYSM_PREFIX));
     }
 
     /**
@@ -70,12 +81,55 @@ public class PhayriosisCompat {
     }
 
     /**
+     * The living entity a damage source is credited to, if any. Prefers the causing
+     * entity (the mob that swung) and falls back to the direct entity (an arrow). The
+     * caller still has to check whether that entity is actually an infection mob.
+     */
+    public static LivingEntity getAttacker(DamageSource source) {
+        if (source == null) return null;
+        Entity causing = source.getEntity();
+        if (causing instanceof LivingEntity living) return living;
+        Entity direct = source.getDirectEntity();
+        return direct instanceof LivingEntity living ? living : null;
+    }
+
+    /**
+     * Best-effort attacker for Phayriosis Reborn's scripted attacks, which are
+     * attributed to nobody at all: the closest living infection mob that is
+     * currently targeting the victim (a nearby mob that is not targeting anybody is
+     * accepted as a fallback).
+     */
+    public static Mob findTargetingInfectionMob(ServerLevel level, LivingEntity victim) {
+        List<Mob> nearby = level.getEntitiesOfClass(
+                Mob.class,
+                victim.getBoundingBox().inflate(32.0),
+                mob -> mob.isAlive() && isInfectionMob(mob)
+        );
+
+        Mob fallback = null;
+        double fallbackDistance = Double.MAX_VALUE;
+
+        for (Mob mob : nearby) {
+            if (mob.getTarget() == victim) {
+                return mob;
+            }
+
+            double distance = mob.distanceToSqr(victim);
+            if (distance < fallbackDistance) {
+                fallbackDistance = distance;
+                fallback = mob;
+            }
+        }
+
+        return fallback;
+    }
+
+    /**
      * Check if a vanilla entity is a farm animal (higher biomass value).
      */
     public static boolean isFarmAnimal(Entity entity) {
-        if (entity == null) return false;
-        String registryName = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-        return FARM_ANIMALS.contains(registryName);
+        String registryName = getEntityRegistryName(entity);
+        return registryName != null && FARM_ANIMALS.contains(registryName);
     }
 
     /**
@@ -89,9 +143,9 @@ public class PhayriosisCompat {
      * Check if a block is a Phayriosis infection block.
      */
     public static boolean isPhayriosisInfectionBlock(Block block) {
-        if (block == null) return false;
-        String name = ForgeRegistries.BLOCKS.getKey(block).toString();
-        if (!name.startsWith(PHAYRIOSIS_PREFIX)) return false;
+        String name = getBlockRegistryName(block);
+        if (name == null || !name.startsWith(PHAYRIOSIS_PREFIX)) return false;
+
         String path = name.substring(PHAYRIOSIS_PREFIX.length()).toLowerCase();
         return path.contains("tumor") || path.contains("infestation") ||
                 path.contains("converted_") || path.contains("phayrilesh") ||
@@ -105,9 +159,34 @@ public class PhayriosisCompat {
      * Check if a block is any infection-related block (Phayriosis or ours).
      */
     public static boolean isInfectionBlock(Block block) {
-        if (block == null) return false;
         if (isPhayriosisInfectionBlock(block)) return true;
-        String name = ForgeRegistries.BLOCKS.getKey(block).toString();
-        return name.startsWith("phayriosis_cataclysm:");
+        String name = getBlockRegistryName(block);
+        return name != null && name.startsWith(CATACLYSM_PREFIX);
+    }
+
+    /**
+     * Phayriosis Reborn's scripted tick attacks use holder-only damage sources
+     * (no causing/direct entity). {@code wasconverted} covers converted/basic/
+     * advanced/elite units and {@code toomuchforeignblood} covers perennial units.
+     */
+    public static boolean isUnattributedAuraDamage(DamageSource source) {
+        return source != null
+                && (source.is(PHAYRIOSIS_WAS_CONVERTED) || source.is(PHAYRIOSIS_FOREIGN_BLOOD));
+    }
+
+    private static String getEntityRegistryName(Entity entity) {
+        return entity == null ? null : getEntityRegistryName(entity.getType());
+    }
+
+    private static String getEntityRegistryName(EntityType<?> type) {
+        if (type == null) return null;
+        ResourceLocation key = ForgeRegistries.ENTITY_TYPES.getKey(type);
+        return key == null ? null : key.toString();
+    }
+
+    private static String getBlockRegistryName(Block block) {
+        if (block == null) return null;
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block);
+        return key == null ? null : key.toString();
     }
 }

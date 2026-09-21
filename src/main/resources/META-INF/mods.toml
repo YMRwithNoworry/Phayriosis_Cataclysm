@@ -1,4 +1,4 @@
-﻿# Phayriosis: Cataclysm - An addon mod for Phayriosis Reborn
+# Phayriosis: Cataclysm - An addon mod for Phayriosis Reborn
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
 license = "${mod_license}"
@@ -19,6 +19,11 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 • Battlefield Merging: Small larvae fuse into massive horrors if left unchecked.
 • Call Swarm: Mobs alert the horde, triggering coordinated rushes.
 • Adaptive Carapace: High-tier infection mobs develop resistance to repeated damage types.
+• Hemolysis: Mobs that keep attacking a target their blows cannot hurt inject a stacking toxin
+  that deals unresistable true damage every second.
+• Targeting Range: every PHA creature hunts with a 64 block sight range (configurable).
+• Simplified-Chinese localization of the whole Phayriosis family (all 5829 keys of both
+  "Phayriosis 1.3.x" and "Phayriosis Reborn 0.3.x"); it applies when the game language is Chinese.
 '''
 
 [[dependencies."${mod_id}"]]

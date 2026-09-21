@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.event;
+package alku.phayriosis_cataclysm.event;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
@@ -7,18 +7,18 @@ import alku.phayriosis_cataclysm.core.PhayriosisCompat;
 import alku.phayriosis_cataclysm.init.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 /**
  * Handles biomass accumulation from mob kills and player deaths.
- * 
+ *
  * When an infection mob kills a vanilla mob -> biomass is added.
  * When a player dies to an infection mob -> massive biomass + infection core spawns.
  */
@@ -33,14 +33,13 @@ public class BiomassEventHandler {
         LivingEntity victim = event.getEntity();
         Level level = victim.level();
         if (level.isClientSide()) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
 
         DamageSource source = event.getSource();
-        Entity attacker = source.getEntity();
+        Entity attacker = resolveInfectionAttacker(serverLevel, victim, source);
 
         // Check if the attacker is an infection mob
         if (attacker == null || !PhayriosisCompat.isInfectionMob(attacker)) return;
-
-        ServerLevel serverLevel = (ServerLevel) level;
 
         if (victim instanceof Player player) {
             // Player killed by infection - major event!
@@ -55,6 +54,25 @@ public class BiomassEventHandler {
             // Regular vanilla mob
             InfectionStageManager.addBiomass(serverLevel, Config.BIOMASS_PER_VANILLA_KILL.get(), "vanilla_mob_kill");
         }
+    }
+
+    /**
+     * Phayriosis Reborn sometimes deals damage through a holder-only
+     * {@code wasconverted} DamageSource with no causing entity. In that case we
+     * infer the attacker from the closest living infection mob that is targeting
+     * the victim. This keeps biomass progression working even for the mod's
+     * scripted attacks.
+     */
+    private static Entity resolveInfectionAttacker(ServerLevel level, LivingEntity victim, DamageSource source) {
+        Entity attacker = source.getEntity();
+        if (attacker != null && PhayriosisCompat.isInfectionMob(attacker)) return attacker;
+
+        Entity direct = source.getDirectEntity();
+        if (direct != null && PhayriosisCompat.isInfectionMob(direct)) return direct;
+
+        if (!PhayriosisCompat.isUnattributedAuraDamage(source)) return null;
+
+        return PhayriosisCompat.findTargetingInfectionMob(level, victim);
     }
 
     /**

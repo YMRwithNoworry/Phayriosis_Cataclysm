@@ -1,5 +1,4 @@
-﻿{
-    "itemGroup.phayriosis_cataclysm.cataclysm_tab": "Phayriosis: Cataclysm",
+{
     "block.phayriosis_cataclysm.infection_core": "Infection Core",
     "block.phayriosis_cataclysm.spore_tower": "Spore Artillery Tower",
     "block.phayriosis_cataclysm.deep_root": "Deep Root Network",
@@ -7,21 +6,15 @@
     "block.phayriosis_cataclysm.flesh_mass": "Flesh Mass",
     "block.phayriosis_cataclysm.hardened_carapace": "Hardened Carapace",
     "block.phayriosis_cataclysm.tendril_cluster": "Tendril Cluster",
-    "item.phayriosis_cataclysm.infection_core": "Infection Core",
-    "item.phayriosis_cataclysm.spore_tower": "Spore Artillery Tower",
-    "item.phayriosis_cataclysm.deep_root": "Deep Root Network",
-    "item.phayriosis_cataclysm.flesh_mass": "Flesh Mass",
-    "item.phayriosis_cataclysm.hardened_carapace": "Hardened Carapace",
-    "item.phayriosis_cataclysm.tendril_cluster": "Tendril Cluster",
-    "item.phayriosis_cataclysm.biomass_sample": "Biomass Sample",
-    "item.phayriosis_cataclysm.spore_sac": "Spore Sac",
-    "item.phayriosis_cataclysm.neural_fragment": "Neural Fragment",
     "entity.phayriosis_cataclysm.spore_projectile": "Spore Projectile",
     "entity.phayriosis_cataclysm.larva": "Infestation Larva",
     "entity.phayriosis_cataclysm.fused_horror": "Fused Horror",
     "death.attack.infection": "%1$s was consumed by the infection",
     "death.attack.infection.player": "%1$s was consumed by the infection whilst fighting %2$s",
+    "death.attack.hemolysis": "%1$s bled out from hemolysis",
+    "death.attack.hemolysis.player": "%1$s bled out from hemolysis whilst fighting %2$s",
     "phayriosis_cataclysm.stage_advance": "Infection Stage: %d",
     "phayriosis_cataclysm.biomass": "Biomass: %.1f",
-    "phayriosis_cataclysm.carapace_active": "Adaptive Carapace Active: %s resistance"
+    "phayriosis_cataclysm.carapace_active": "Adaptive Carapace Active: %s resistance",
+    "effect.phayriosis_cataclysm.hemolysis": "Hemolysis"
 }

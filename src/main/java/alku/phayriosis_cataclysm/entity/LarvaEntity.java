@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.entity;
+package alku.phayriosis_cataclysm.entity;
 
 import alku.phayriosis_cataclysm.entity.ai.CallSwarmGoal;
 import alku.phayriosis_cataclysm.entity.ai.MergeGoal;
@@ -16,6 +16,8 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -47,7 +49,9 @@ public class LarvaEntity extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.3)
                 .add(Attributes.ATTACK_DAMAGE, 3.0)
                 .add(Attributes.ARMOR, 2.0)
-                .add(Attributes.FOLLOW_RANGE, 24.0);
+                // Targeting range: every PHA creature is normalised to Config.PHA_FOLLOW_RANGE
+                // when it joins the world; this is the pre-join default and should match it.
+                .add(Attributes.FOLLOW_RANGE, 64.0);
     }
 
     @Override

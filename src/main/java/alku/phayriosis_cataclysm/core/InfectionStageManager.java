@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.core;
+package alku.phayriosis_cataclysm.core;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
@@ -25,7 +25,10 @@ public class InfectionStageManager {
     public static void addBiomass(ServerLevel level, double amount, String source) {
         if (level == null || level.isClientSide()) return;
 
-        InfectionStageData data = InfectionStageData.get(level);
+        ServerLevel overworld = getOverworld(level);
+        if (overworld == null) return;
+
+        InfectionStageData data = InfectionStageData.get(overworld);
         int oldStage = data.getStage();
         data.addBiomass(amount);
 
@@ -37,9 +40,9 @@ public class InfectionStageManager {
         // Broadcast if stage changed or enough biomass changed
         int newStage = data.getStage();
         if (newStage != oldStage) {
-            broadcastStageChange(level, newStage, data.getBiomass());
+            broadcastStageChange(overworld, newStage, data.getBiomass());
         } else if (Math.abs(data.getBiomass() - lastBroadcastBiomass) > 10.0) {
-            syncToClients(level, data);
+            syncToClients(overworld, data);
         }
     }
 
@@ -51,7 +54,30 @@ public class InfectionStageManager {
         lastBroadcastBiomass = biomass;
         syncToClients(level, InfectionStageData.get(level));
 
-        Phayriosis_cataclysm.LOGGER.info("[Phayriosis Cataclysm] Infection stage advanced to {}! (Biomass: {})", newStage, biomass);
+        Phayriosis_cataclysm.LOGGER.info("[Phayriosis Cataclysm] Infection stage changed to {}! (Biomass: {})", newStage, biomass);
+    }
+
+    /**
+     * Set the overworld stage directly. Mostly useful for testing and admin commands.
+     */
+    public static void setCurrentStage(int stage) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        ServerLevel overworld = server.overworld();
+        if (overworld == null) return;
+
+        InfectionStageData data = InfectionStageData.get(overworld);
+        int oldStage = data.getStage();
+        data.setStage(stage);
+        if (data.getStage() != oldStage) {
+            broadcastStageChange(overworld, data.getStage(), data.getBiomass());
+        }
+    }
+
+    private static ServerLevel getOverworld(ServerLevel level) {
+        MinecraftServer server = level.getServer();
+        if (server == null) return null;
+        return server.overworld();
     }
 
     /**
@@ -72,7 +98,9 @@ public class InfectionStageManager {
      * Sync stage data to a single player (e.g., on login).
      */
     public static void syncToPlayer(ServerLevel level, ServerPlayer player) {
-        InfectionStageData data = InfectionStageData.get(level);
+        ServerLevel overworld = getOverworld(level);
+        if (overworld == null) return;
+        InfectionStageData data = InfectionStageData.get(overworld);
         PacketHandler.sendToPlayer(new StageSyncPacket(data.getStage(), data.getBiomass()), player);
     }
 

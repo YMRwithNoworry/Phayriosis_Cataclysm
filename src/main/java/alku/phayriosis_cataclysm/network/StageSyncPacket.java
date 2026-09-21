@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.network;
+package alku.phayriosis_cataclysm.network;
 
 import alku.phayriosis_cataclysm.core.ClientStageData;
 import net.minecraft.network.FriendlyByteBuf;

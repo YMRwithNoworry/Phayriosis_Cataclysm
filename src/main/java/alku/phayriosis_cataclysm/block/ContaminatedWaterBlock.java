@@ -1,24 +1,22 @@
-﻿package alku.phayriosis_cataclysm.block;
+package alku.phayriosis_cataclysm.block;
 
 import alku.phayriosis_cataclysm.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import java.util.Random;
 
 /**
  * Contaminated Water - replaces water sources near infection.
@@ -64,7 +62,7 @@ public class ContaminatedWaterBlock extends Block {
      * Spread contaminated water along water flow and convert adjacent water.
      */
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (random.nextFloat() > Config.WATER_SPREAD_SPEED.get()) return;
 
         // Try to spread to adjacent water blocks
@@ -84,7 +82,7 @@ public class ContaminatedWaterBlock extends Block {
      * Also spread on scheduled tick (triggered when infection blocks are near water).
      */
     @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         this.randomTick(state, level, pos, random);
     }
 }

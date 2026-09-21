@@ -1,5 +1,4 @@
-﻿{
-    "itemGroup.phayriosis_cataclysm.cataclysm_tab": "Phayriosis: 灾变",
+{
     "block.phayriosis_cataclysm.infection_core": "感染核心",
     "block.phayriosis_cataclysm.spore_tower": "孢子炮塔",
     "block.phayriosis_cataclysm.deep_root": "深层根系网络",
@@ -7,21 +6,15 @@
     "block.phayriosis_cataclysm.flesh_mass": "血肉团块",
     "block.phayriosis_cataclysm.hardened_carapace": "硬化甲壳",
     "block.phayriosis_cataclysm.tendril_cluster": "触须丛",
-    "item.phayriosis_cataclysm.infection_core": "感染核心",
-    "item.phayriosis_cataclysm.spore_tower": "孢子炮塔",
-    "item.phayriosis_cataclysm.deep_root": "深层根系网络",
-    "item.phayriosis_cataclysm.flesh_mass": "血肉团块",
-    "item.phayriosis_cataclysm.hardened_carapace": "硬化甲壳",
-    "item.phayriosis_cataclysm.tendril_cluster": "触须丛",
-    "item.phayriosis_cataclysm.biomass_sample": "生物质样本",
-    "item.phayriosis_cataclysm.spore_sac": "孢子囊",
-    "item.phayriosis_cataclysm.neural_fragment": "神经碎片",
     "entity.phayriosis_cataclysm.spore_projectile": "孢子弹",
     "entity.phayriosis_cataclysm.larva": "感染幼虫",
     "entity.phayriosis_cataclysm.fused_horror": "融合恐惧体",
     "death.attack.infection": "%1$s 被感染吞噬了",
     "death.attack.infection.player": "%1$s 在与 %2$s 的战斗中被感染吞噬了",
+    "death.attack.hemolysis": "%1$s 因溶血而死亡",
+    "death.attack.hemolysis.player": "%1$s 在与 %2$s 的战斗中因溶血而死亡",
     "phayriosis_cataclysm.stage_advance": "感染阶段：%d",
     "phayriosis_cataclysm.biomass": "生物质：%.1f",
-    "phayriosis_cataclysm.carapace_active": "自适应甲壳激活：%s 抗性"
+    "phayriosis_cataclysm.carapace_active": "自适应甲壳激活：%s 抗性",
+    "effect.phayriosis_cataclysm.hemolysis": "溶血"
 }

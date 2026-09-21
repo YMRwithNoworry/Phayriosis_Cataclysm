@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.event;
+package alku.phayriosis_cataclysm.event;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;

@@ -1,4 +1,4 @@
-﻿package alku.phayriosis_cataclysm.block;
+package alku.phayriosis_cataclysm.block;
 
 import alku.phayriosis_cataclysm.init.ModBlockEntities;
 import net.minecraft.core.BlockPos;

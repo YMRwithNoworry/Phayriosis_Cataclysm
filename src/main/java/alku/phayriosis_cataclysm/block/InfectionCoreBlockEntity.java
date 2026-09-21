@@ -1,7 +1,9 @@
-﻿package alku.phayriosis_cataclysm.block;
+package alku.phayriosis_cataclysm.block;
 
 import alku.phayriosis_cataclysm.Config;
+import alku.phayriosis_cataclysm.event.SpreadHandler;
 import alku.phayriosis_cataclysm.init.ModBlockEntities;
+import alku.phayriosis_cataclysm.init.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -68,6 +70,9 @@ public class InfectionCoreBlockEntity extends BlockEntity {
                 BlockState converted = getConversionResult(current, random);
                 if (converted != null) {
                     level.setBlock(target, converted, 3);
+                    if (converted.is(ModBlocks.DEEP_ROOT.get())) {
+                        SpreadHandler.onRootPlaced(serverLevel, target);
+                    }
                 }
             }
         }
@@ -85,14 +90,13 @@ public class InfectionCoreBlockEntity extends BlockEntity {
     }
 
     private BlockState getConversionResult(BlockState original, Random random) {
-        // Return infection blocks from Phayriosis or our mod
-        // Since we can't reference Phayriosis blocks directly, we use our own
-        var blocks = alku.phayriosis_cataclysm.init.ModBlocks;
+        // Return infection blocks from Phayriosis or our mod.
+        // Since we can't reference Phayriosis blocks directly, we use our own.
         switch (random.nextInt(3)) {
-            case 0: return blocks.FLESH_MASS.get().defaultBlockState();
-            case 1: return blocks.DEEP_ROOT.get().defaultBlockState();
-            case 2: return blocks.TENDRIL_CLUSTER.get().defaultBlockState();
-            default: return blocks.FLESH_MASS.get().defaultBlockState();
+            case 0: return ModBlocks.FLESH_MASS.get().defaultBlockState();
+            case 1: return ModBlocks.DEEP_ROOT.get().defaultBlockState();
+            case 2: return ModBlocks.TENDRIL_CLUSTER.get().defaultBlockState();
+            default: return ModBlocks.FLESH_MASS.get().defaultBlockState();
         }
     }
 
