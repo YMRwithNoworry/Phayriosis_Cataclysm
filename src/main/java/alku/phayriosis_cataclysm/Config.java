@@ -2,6 +2,8 @@ package alku.phayriosis_cataclysm;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.List;
+
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
@@ -192,6 +194,52 @@ public class Config {
 
     public static final ForgeConfigSpec.DoubleValue MERGED_ENTITY_DAMAGE_MULTIPLIER = BUILDER
             .comment("Damage multiplier for merged entities vs base").defineInRange("mergedEntityDamageMultiplier", 2.0, 1.0, 10.0);
+
+    // ========== Holy Empowerment (Dreadmind) ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_HOLY_EMPOWERMENT = BUILDER
+            .comment("Whether Dreadminds periodically empower nearby PHA units with the Holy effect")
+            .define("enableHolyEmpowerment", true);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HOLY_MIND_MOBS = BUILDER
+            .comment("Entities that perform the holy empowerment, by registry name.",
+                    "Defaults cover both PHA versions (the Dreadmind family).")
+            .defineList("holyMindMobs", List.of(
+                    "phayriosisreborn:dreadmind",
+                    "phayriosis:primitive_dreadmind",
+                    "phayriosis:morbid_dreadmind"), o -> o instanceof String);
+
+    public static final ForgeConfigSpec.IntValue HOLY_PULSE_INTERVAL = BUILDER
+            .comment("Ticks between two holy pulses of each Dreadmind (600 = 30 seconds)")
+            .defineInRange("holyPulseInterval", 600, 20, 24000);
+
+    public static final ForgeConfigSpec.IntValue HOLY_UNITS_PER_PULSE = BUILDER
+            .comment("How many nearby PHA units a single pulse empowers")
+            .defineInRange("holyUnitsPerPulse", 3, 1, 32);
+
+    public static final ForgeConfigSpec.DoubleValue HOLY_SEARCH_RADIUS = BUILDER
+            .comment("Radius in blocks a Dreadmind looks for units to empower")
+            .defineInRange("holySearchRadius", 32.0, 4.0, 128.0);
+
+    public static final ForgeConfigSpec.IntValue HOLY_DURATION = BUILDER
+            .comment("Duration of the Holy effect in ticks (refreshed by every pulse)")
+            .defineInRange("holyDuration", 900, 20, 72000);
+
+    public static final ForgeConfigSpec.DoubleValue HOLY_ATTRIBUTE_MULTIPLIER = BUILDER
+            .comment("All of an empowered unit's attributes are multiplied by this value (1.5 = 150%)")
+            .defineInRange("holyAttributeMultiplier", 1.5, 1.0, 10.0);
+
+    public static final ForgeConfigSpec.DoubleValue HOLY_VULNERABILITY_PER_HIT = BUILDER
+            .comment("Each hit from a holy unit increases the damage its victim takes from PHA creatures",
+                    "by this fraction (0.1 = +10% per hit)")
+            .defineInRange("holyVulnerabilityPerHit", 0.1, 0.0, 5.0);
+
+    public static final ForgeConfigSpec.IntValue HOLY_VULNERABILITY_MAX_STACKS = BUILDER
+            .comment("Maximum vulnerability stacks a victim can accumulate (+200% at 20 stacks)")
+            .defineInRange("holyVulnerabilityMaxStacks", 20, 1, 200);
+
+    public static final ForgeConfigSpec.IntValue HOLY_VULNERABILITY_DURATION = BUILDER
+            .comment("Ticks the vulnerability stacks survive after the last holy hit (0 = never expire)")
+            .defineInRange("holyVulnerabilityDuration", 600, 0, 72000);
 
     // ========== Hemolysis ==========
     public static final ForgeConfigSpec.BooleanValue ENABLE_HEMOLYSIS = BUILDER

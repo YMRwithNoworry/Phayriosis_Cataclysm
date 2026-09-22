@@ -16,5 +16,6 @@
     "phayriosis_cataclysm.stage_advance": "Infection Stage: %d",
     "phayriosis_cataclysm.biomass": "Biomass: %.1f",
     "phayriosis_cataclysm.carapace_active": "Adaptive Carapace Active: %s resistance",
-    "effect.phayriosis_cataclysm.hemolysis": "Hemolysis"
+    "effect.phayriosis_cataclysm.hemolysis": "Hemolysis",
+    "effect.phayriosis_cataclysm.holy": "Holy"
 }

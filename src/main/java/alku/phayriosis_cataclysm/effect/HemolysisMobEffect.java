@@ -2,9 +2,7 @@ package alku.phayriosis_cataclysm.effect;
 
 import alku.phayriosis_cataclysm.Config;
 import alku.phayriosis_cataclysm.core.ModDamageTypes;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.damagesource.DamageSource;
+import alku.phayriosis_cataclysm.core.TrueDamage;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -67,30 +65,7 @@ public class HemolysisMobEffect extends MobEffect {
      * Apply unresistable damage to the victim.
      */
     public static void applyTrueDamage(LivingEntity victim, float amount) {
-        DamageSource source = ModDamageTypes.source(victim.level(), ModDamageTypes.HEMOLYSIS);
-
-        // Absorption (golden hearts) is a shield in front of the real health bar, and
-        // `hurt` always drains it first regardless of the damage type tags. Take it out
-        // of the equation so the bleed always eats real health, then put it back.
-        float absorption = victim.getAbsorptionAmount();
-        if (absorption > 0.0F) {
-            victim.setAbsorptionAmount(0.0F);
-        }
-
-        // `bypasses_cooldown` already ignores hurt immunity, but a stale timer from an
-        // unrelated hit would still eat the very first bleed tick; clear it explicitly.
-        victim.invulnerableTime = 0;
-
-        victim.hurt(source, amount);
-
-        if (absorption > 0.0F && victim.isAlive()) {
-            victim.setAbsorptionAmount(absorption);
-        }
-
-        if (victim.level() instanceof ServerLevel level) {
-            level.sendParticles(ParticleTypes.DAMAGE_INDICATOR,
-                    victim.getX(), victim.getY() + victim.getBbHeight() * 0.5D, victim.getZ(),
-                    3, victim.getBbWidth() * 0.5D, victim.getBbHeight() * 0.35D, victim.getBbWidth() * 0.5D, 0.0D);
-        }
+        TrueDamage.apply(victim, amount, ModDamageTypes.source(victim.level(), ModDamageTypes.HEMOLYSIS));
+        TrueDamage.damageParticles(victim);
     }
 }

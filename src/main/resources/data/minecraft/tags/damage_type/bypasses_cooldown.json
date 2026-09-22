@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "phayriosis_cataclysm:hemolysis"
+    "phayriosis_cataclysm:hemolysis",
+    "phayriosis_cataclysm:holy_infection"
   ]
 }

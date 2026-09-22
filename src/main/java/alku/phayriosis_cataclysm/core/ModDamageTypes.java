@@ -6,7 +6,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
 
 /**
  * Damage types shipped by the addon's own datapack.
@@ -26,6 +29,14 @@ public final class ModDamageTypes {
      */
     public static final ResourceKey<DamageType> HEMOLYSIS = key("hemolysis");
 
+    /**
+     * Damage dealt by PHA creatures to a holy (empowered) target. Every hit against a holy
+     * unit is rerouted through this type, so it keeps ignoring armour, enchantments,
+     * Resistance, absorption and shields while still carrying the original attacker for
+     * aggro and death messages. It shares the {@code infection} death message.
+     */
+    public static final ResourceKey<DamageType> HOLY_INFECTION = key("holy_infection");
+
     private ModDamageTypes() {
     }
 
@@ -40,8 +51,17 @@ public final class ModDamageTypes {
      * effect, which keeps the kill from being credited as a melee hit.
      */
     public static DamageSource source(Level level, ResourceKey<DamageType> type) {
+        return source(level, type, null, null);
+    }
+
+    /**
+     * Build a damage source for a datapack damage type, optionally attributed to the
+     * entities that caused it.
+     */
+    public static DamageSource source(Level level, ResourceKey<DamageType> type,
+                                      @Nullable Entity directEntity, @Nullable Entity causingEntity) {
         return new DamageSource(level.registryAccess()
                 .registryOrThrow(Registries.DAMAGE_TYPE)
-                .getHolderOrThrow(type));
+                .getHolderOrThrow(type), directEntity, causingEntity);
     }
 }

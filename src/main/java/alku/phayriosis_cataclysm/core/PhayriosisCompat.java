@@ -140,6 +140,14 @@ public class PhayriosisCompat {
     }
 
     /**
+     * Registry id of an entity ("phayriosisreborn:dreadmind"), or {@code null} when the
+     * entity is null or unregistered. Handy for config-driven entity lists.
+     */
+    public static String getEntityId(Entity entity) {
+        return getEntityRegistryName(entity);
+    }
+
+    /**
      * Check if a block is a Phayriosis infection block.
      */
     public static boolean isPhayriosisInfectionBlock(Block block) {

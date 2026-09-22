@@ -2,6 +2,7 @@ package alku.phayriosis_cataclysm.init;
 
 import alku.phayriosis_cataclysm.Phayriosis_cataclysm;
 import alku.phayriosis_cataclysm.effect.HemolysisMobEffect;
+import alku.phayriosis_cataclysm.effect.HolyMobEffect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,4 +16,8 @@ public class ModEffects {
     // Hemolysis - stacking true damage inflicted by PHA creatures
     public static final RegistryObject<MobEffect> HEMOLYSIS =
             MOB_EFFECTS.register("hemolysis", HemolysisMobEffect::new);
+
+    // Holy - Dreadmind blessing: 150% attributes, marks victims, takes true damage from PHA
+    public static final RegistryObject<MobEffect> HOLY =
+            MOB_EFFECTS.register("holy", HolyMobEffect::new);
 }
