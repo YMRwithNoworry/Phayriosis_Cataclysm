@@ -280,6 +280,37 @@ public class Config {
                     "Disabled by default because that aura ticks far more often than a real swing does.")
             .define("hemolysisCountScriptedDamage", false);
 
+    // ========== PHA Infighting ==========
+    /**
+     * How strictly PHA creatures are kept from fighting each other.
+     */
+    public enum InfightingScope {
+        /** Vanilla behaviour: the PHA mobs may attack each other. */
+        OFF,
+        /** Creatures of different PHA mods never target or damage each other (default). */
+        CROSS_MOD,
+        /** No PHA creature ever attacks another PHA creature, not even its own kin. */
+        ALL_PHA
+    }
+
+    public static final ForgeConfigSpec.EnumValue<InfightingScope> PHA_INFIGHTING = BUILDER
+            .comment("Whether creatures of the two PHA mods (and this addon's own mobs) may attack each other.",
+                    "OFF     = vanilla behaviour, they may fight.",
+                    "CROSS_MOD = mobs from different PHA namespaces never target or damage each other (default).",
+                    "ALL_PHA = no PHA creature ever attacks another PHA creature.",
+                    "The rule cancels target acquisition, melee/projectile attacks and Phayriosis Reborn's",
+                    "unattributed contact aura against protected creatures.")
+            .defineEnum("phaInfighting", InfightingScope.CROSS_MOD);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> PHA_NAMESPACES = BUILDER
+            .comment("Registry namespaces that count as PHA mods for the rule above.",
+                    "phayriosisreborn = Phayriosis Reborn 0.3.x, phayriosis = Phayriosis 1.3.x,",
+                    "phayriosis_cataclysm = this addon.")
+            .defineList("phaNamespaces", List.of(
+                    "phayriosisreborn",
+                    "phayriosis",
+                    "phayriosis_cataclysm"), o -> o instanceof String);
+
     // ========== Phayriosis Reborn Compatibility ==========
     public static final ForgeConfigSpec.BooleanValue PARASITE_AURA_DAMAGE_ENABLED = BUILDER
             .comment("Allows Phayriosis Reborn parasites to deal unattributed scripted contact damage",

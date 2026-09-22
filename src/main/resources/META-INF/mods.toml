@@ -25,6 +25,8 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 • Holy Empowerment: every 30 seconds a Dreadmind blesses 3 nearby units - 150% attributes,
   golden aura, marked victims take growing PHA damage and all PHA damage against them is true
   damage (all values configurable).
+• PHA Infighting: with both Phayriosis versions installed, creatures of different PHA mods never
+  target or damage each other (scope configurable: cross-mod / all PHA / off).
 • Simplified-Chinese localization of the whole Phayriosis family (all 5829 keys of both
   "Phayriosis 1.3.x" and "Phayriosis Reborn 0.3.x"); it applies when the game language is Chinese.
 '''
