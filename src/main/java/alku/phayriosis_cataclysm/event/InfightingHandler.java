@@ -113,12 +113,13 @@ public class InfightingHandler {
         };
     }
 
-    /** Whether this entity belongs to one of the configured PHA namespaces. */
+    /**
+     * Whether this entity belongs to one of the configured PHA namespaces. Delegates to
+     * {@link PhayriosisCompat#isPhaCreature(Entity)} so the infighting rule, the damage cap and
+     * every future PHA-wide rule agree on what a PHA creature is.
+     */
     public static boolean isPhaCreature(Entity entity) {
-        String id = PhayriosisCompat.getEntityId(entity);
-        if (id == null) return false;
-        String namespace = namespaceOf(id);
-        return Config.PHA_NAMESPACES.get().contains(namespace);
+        return PhayriosisCompat.isPhaCreature(entity);
     }
 
     /** Namespace part of a registry id ("phayriosis:primitive_dreadmind" -> "phayriosis"). */

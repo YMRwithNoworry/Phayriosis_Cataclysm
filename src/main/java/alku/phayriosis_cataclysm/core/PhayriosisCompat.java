@@ -1,5 +1,6 @@
 package alku.phayriosis_cataclysm.core;
 
+import alku.phayriosis_cataclysm.Config;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -70,6 +71,21 @@ public class PhayriosisCompat {
         String registryName = getEntityRegistryName(entity);
         return registryName != null
                 && (registryName.startsWith(PHAYRIOSIS_PREFIX) || registryName.startsWith(CATACLYSM_PREFIX));
+    }
+
+    /**
+     * Whether this entity belongs to one of the namespaces the pack treats as PHA mods
+     * ({@link Config#PHA_NAMESPACES}: Phayriosis, Phayriosis Reborn and this addon by
+     * default). This is the registry-id driven definition used by the rules that have to
+     * cover <em>every</em> PHA creature rather than only the ones of this addon and
+     * Phayriosis Reborn - the infighting rule and the damage cap.
+     */
+    public static boolean isPhaCreature(Entity entity) {
+        String id = getEntityRegistryName(entity);
+        if (id == null) return false;
+
+        ResourceLocation location = ResourceLocation.tryParse(id);
+        return location != null && Config.PHA_NAMESPACES.get().contains(location.getNamespace());
     }
 
     /**

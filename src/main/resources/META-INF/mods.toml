@@ -27,6 +27,9 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
   damage (all values configurable).
 • PHA Infighting: with both Phayriosis versions installed, creatures of different PHA mods never
   target or damage each other (scope configurable: cross-mod / all PHA / off).
+• PHA Damage Cap: one hit can take at most 20 health (10 hearts) off a PHA creature, however
+  large the blow was - armour piercing, criticals and true damage included (ceiling and
+  per-damage-type exceptions configurable).
 • Simplified-Chinese localization of the whole Phayriosis family (all 5829 keys of both
   "Phayriosis 1.3.x" and "Phayriosis Reborn 0.3.x"); it applies when the game language is Chinese.
 '''

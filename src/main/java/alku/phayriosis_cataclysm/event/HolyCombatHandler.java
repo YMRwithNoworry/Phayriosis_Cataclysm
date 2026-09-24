@@ -85,9 +85,11 @@ public class HolyCombatHandler {
 
     /**
      * Rule 2 applied to the damage itself: scale up what PHA creatures deal to a marked
-     * victim. Runs last so it sees the final amount.
+     * victim. Runs late so it sees the final amount, but one step before
+     * {@link DamageCapHandler} (which sits at the very end of the chain) so the per-hit
+     * ceiling of a PHA victim cannot be multiplied away.
      */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.LOW)
     public static void onLivingDamage(LivingDamageEvent event) {
         if (!Config.ENABLE_HOLY_EMPOWERMENT.get()) return;
 

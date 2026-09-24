@@ -311,6 +311,30 @@ public class Config {
                     "phayriosis",
                     "phayriosis_cataclysm"), o -> o instanceof String);
 
+    // ========== PHA Damage Cap ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_DAMAGE_CAP = BUILDER
+            .comment("Whether every PHA creature has a per-hit damage ceiling.")
+            .define("enableDamageCap", true);
+
+    public static final ForgeConfigSpec.DoubleValue PHA_DAMAGE_CAP = BUILDER
+            .comment("Most health a single hit may take off a PHA creature (20 = 10 hearts).",
+                    "The creatures covered are the ones registered under the phaNamespaces above, so",
+                    "the cap covers both Phayriosis versions and this addon's own mobs, and nothing",
+                    "else (players and vanilla mobs are untouched).",
+                    "The ceiling bites on the incoming hit before armour absorbs anything and is",
+                    "checked once more on the final amount that reaches the health bar, so armour",
+                    "piercing, criticals, true damage, holy vulnerability and damage added by other",
+                    "mods can never push one hit past it either.")
+            .defineInRange("phaDamageCap", 20.0, 1.0, 10000.0);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> DAMAGE_CAP_BYPASS_DAMAGE_TYPES = BUILDER
+            .comment("Damage types that ignore the cap above, by registry id",
+                    "(e.g. minecraft:out_of_world, minecraft:generic_kill). The bare registry path",
+                    "without a namespace ('out_of_world') is accepted as well; that is the path, not",
+                    "the death-message id ('outOfWorld' for the same type).",
+                    "Empty by default: nothing is allowed past the cap.")
+            .defineList("damageCapBypassDamageTypes", List.<String>of(), o -> o instanceof String);
+
     // ========== Phayriosis Reborn Compatibility ==========
     public static final ForgeConfigSpec.BooleanValue PARASITE_AURA_DAMAGE_ENABLED = BUILDER
             .comment("Allows Phayriosis Reborn parasites to deal unattributed scripted contact damage",
