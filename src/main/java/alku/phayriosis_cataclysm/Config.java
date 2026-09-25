@@ -356,19 +356,15 @@ public class Config {
             .define("enableHemolysis", true);
 
     public static final ForgeConfigSpec.IntValue HEMOLYSIS_HITS_TO_TRIGGER = BUILDER
-            .comment("How many consecutive hits a PHA creature must land on the same target to inflict Hemolysis")
+            .comment("How many consecutive attacks a PHA creature has to land on the same target to",
+                    "inflict Hemolysis. The attack itself counts, not the health it took off: armour,",
+                    "shields, Resistance and hurt-immunity frames do not matter.")
             .defineInRange("hemolysisHitsToTrigger", 5, 1, 100);
 
-    public static final ForgeConfigSpec.DoubleValue HEMOLYSIS_DAMAGE_RATIO_THRESHOLD = BUILDER
-            .comment("Hemolysis is only inflicted when the damage those hits actually dealt is below this",
-                    "multiple of the attacker's attack power (4.0 = 400%).",
-                    "Targets that mitigate the hits (armour, Resistance, absorption, shields) are the ones",
-                    "that end up bleeding; fragile targets simply take the damage and are spared.")
-            .defineInRange("hemolysisDamageRatioThreshold", 4.0, 0.0, 100.0);
-
     public static final ForgeConfigSpec.IntValue HEMOLYSIS_DURATION = BUILDER
-            .comment("Base duration of Hemolysis in ticks (20 ticks = 1 second)")
-            .defineInRange("hemolysisDuration", 600, 20, 72000);
+            .comment("Base duration of Hemolysis in ticks (100 = 5 seconds). Every further completed",
+                    "streak refreshes it and adds a layer.")
+            .defineInRange("hemolysisDuration", 100, 20, 72000);
 
     public static final ForgeConfigSpec.DoubleValue HEMOLYSIS_DAMAGE_PER_SECOND = BUILDER
             .comment("True damage dealt every second, as a fraction of the victim's max health, per layer",
@@ -380,8 +376,9 @@ public class Config {
             .defineInRange("hemolysisMaxLayers", 10, 1, 127);
 
     public static final ForgeConfigSpec.IntValue HEMOLYSIS_STREAK_WINDOW = BUILDER
-            .comment("Ticks allowed between two hits before the attack streak resets")
-            .defineInRange("hemolysisStreakWindow", 200, 1, 6000);
+            .comment("Window the whole streak has to fit in, counted from its first attack",
+                    "(1200 = one minute). Attacks spaced further apart than this start over.")
+            .defineInRange("hemolysisStreakWindow", 1200, 1, 24000);
 
     public static final ForgeConfigSpec.BooleanValue HEMOLYSIS_COUNT_SCRIPTED_DAMAGE = BUILDER
             .comment("Also treat Phayriosis Reborn's unattributed scripted damage (the instant contact",

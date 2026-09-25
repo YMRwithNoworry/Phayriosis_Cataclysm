@@ -19,8 +19,9 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 • Battlefield Merging: Small larvae fuse into massive horrors if left unchecked.
 • Call Swarm: Mobs alert the horde, triggering coordinated rushes.
 • Adaptive Carapace: High-tier infection mobs develop resistance to repeated damage types.
-• Hemolysis: Mobs that keep attacking a target their blows cannot hurt inject a stacking toxin
-  that deals unresistable true damage every second.
+• Hemolysis: five attacks on the same victim inside one minute make a PHA creature inject a
+  stacking toxin. The victim bleeds for 5 seconds and loses a share of its maximum health as
+  unresistable true damage every second; every further streak adds a layer (all configurable).
 • Metamorphosis: every attack a low-tier PHA creature lands (under 40 max health) has a 30%
   chance to turn the attacker into an abominable unit - humanoids into the Abominable Human,
   beasts into the Abominable Bear, endermen and water creatures into their own abominable forms.
@@ -43,14 +44,14 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 
 [[dependencies."${mod_id}"]]
 modId = "forge"
-mandatory = true
+mandatory = false
 versionRange = "${forge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
 modId = "minecraft"
-mandatory = true
+mandatory = false
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"

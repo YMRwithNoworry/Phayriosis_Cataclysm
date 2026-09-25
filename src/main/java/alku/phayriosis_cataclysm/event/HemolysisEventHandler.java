@@ -9,9 +9,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,41 +23,33 @@ import java.util.UUID;
 /**
  * Hemolysis (溶血) trigger.
  *
- * <p>A PHA creature that keeps attacking the same victim without actually hurting it
- * eventually gives up on brute force and injects a haemolysin instead. Concretely:
- * after {@code hemolysisHitsToTrigger} (5) consecutive hits on one target, if the
- * damage those hits <em>actually dealt</em> is still below
- * {@code hemolysisDamageRatioThreshold} (400%) of the attacker's own attack power,
- * the target receives a 30 second Hemolysis effect. Every further trigger adds one
- * layer, and each layer replaces the duration.</p>
+ * <p>A PHA creature that attacks the same victim {@code hemolysisHitsToTrigger} (5) times inside
+ * {@code hemolysisStreakWindow} (one minute) injects a haemolysin: the victim receives a
+ * {@code hemolysisDuration} (5 second) Hemolysis effect. Every further completed streak adds one
+ * layer on top of it, up to {@code hemolysisMaxLayers}.</p>
  *
- * <p>The comparison deliberately uses the damage after armour, enchantments,
- * Resistance, shields and absorption - that is the situation the mechanic exists for:
- * a target that is soaking the hits. A target that takes the hits at full strength
- * simply dies instead of bleeding.</p>
- *
- * <p>Hits are counted in {@link LivingDamageEvent} (post-mitigation health damage)
- * rather than {@link net.minecraftforge.event.entity.living.LivingHurtEvent}
- * (pre-armour damage), and the streak is dropped as soon as the attacker switches
- * targets or the hits are spaced further apart than
- * {@code hemolysisStreakWindow}.</p>
+ * <p>The count is kept on the attacks themselves, through {@link LivingAttackEvent}: a shield,
+ * armour, Resistance, absorption or the victim's hurt-immunity frames may well swallow the blow,
+ * the creature still gets credit for swinging. Attacks that another rule already cancelled - PHA
+ * infighting, an attacker that is stunned - do not count. The streak restarts as soon as the
+ * attacker switches targets or the five attacks no longer fit inside the window.</p>
  */
 @Mod.EventBusSubscriber(modid = Phayriosis_cataclysm.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HemolysisEventHandler {
 
-    /** Consecutive hits per attacker, keyed by the attacker's UUID. */
+    /** Attack streaks per attacker, keyed by the attacker's UUID. */
     private static final Map<UUID, AttackStreak> STREAKS = new HashMap<>();
 
     /** How often (in ticks) streaks of entities that no longer exist are purged. */
     private static final int CLEANUP_INTERVAL = 600;
 
     /**
-     * Track the damage a PHA creature actually deals and inflict Hemolysis once the
-     * streak is long enough while the damage stayed low. Runs last so it sees the
-     * damage every other listener has already agreed on.
+     * Count the attack itself and inject the toxin once the streak is complete. Runs last so
+     * attacks other listeners cancelled are already marked as such.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingDamage(LivingDamageEvent event) {
+    public static void onLivingAttack(LivingAttackEvent event) {
+        if (event.isCanceled()) return;
         if (!Config.ENABLE_HEMOLYSIS.get()) return;
 
         LivingEntity victim = event.getEntity();
@@ -70,32 +61,26 @@ public class HemolysisEventHandler {
         if (attacker == null || attacker == victim) return;
         if (!PhayriosisCompat.isInfectionMob(attacker)) return;
 
-        float dealt = Math.max(0.0F, event.getAmount());
         long now = level.getGameTime();
         AttackStreak streak = STREAKS.get(attacker.getUUID());
+        long window = Config.HEMOLYSIS_STREAK_WINDOW.get();
 
-        // A new victim, an expired streak or a forgotten attacker starts counting from one.
+        // A new victim, a finished streak or a window that no longer holds the first attack all
+        // start the count over.
         boolean restart = streak == null
                 || !streak.targetId().equals(victim.getUUID())
-                || now - streak.lastHitTick() > Config.HEMOLYSIS_STREAK_WINDOW.get();
+                || now - streak.firstHitTick() > window;
 
-        int hits = restart ? 1 : streak.hits() + 1;
-        float totalDamage = (restart ? 0.0F : streak.totalDamage()) + dealt;
-        float strongestHit = restart ? dealt : Math.max(streak.maxHit(), dealt);
+        AttackStreak updated = restart
+                ? new AttackStreak(victim.getUUID(), 1, now)
+                : new AttackStreak(victim.getUUID(), streak.hits() + 1, streak.firstHitTick());
 
-        if (hits < Config.HEMOLYSIS_HITS_TO_TRIGGER.get()) {
-            STREAKS.put(attacker.getUUID(), new AttackStreak(victim.getUUID(), hits, totalDamage, strongestHit, now));
+        if (updated.hits() < Config.HEMOLYSIS_HITS_TO_TRIGGER.get()) {
+            STREAKS.put(attacker.getUUID(), updated);
             return;
         }
 
-        // Threshold reached: the parasite only resorts to the toxin when chewing on the
-        // target was not getting anywhere (damage below 400% of its own attack power).
-        float attackPower = attackPower(attacker, strongestHit);
-        float threshold = attackPower * Config.HEMOLYSIS_DAMAGE_RATIO_THRESHOLD.get().floatValue();
-        if (totalDamage < threshold) {
-            inflictHemolysis(attacker, victim);
-        }
-
+        inflictHemolysis(attacker, victim);
         STREAKS.remove(attacker.getUUID());
     }
 
@@ -119,9 +104,9 @@ public class HemolysisEventHandler {
     }
 
     /**
-     * The PHA creature behind a damage source. Real attacks carry their attacker;
-     * Phayriosis Reborn's scripted contact aura does not, so it can optionally be
-     * traced back to the nearest infection mob targeting the victim.
+     * The PHA creature behind an attack. Real attacks carry their attacker; Phayriosis Reborn's
+     * scripted contact aura does not, so it can optionally be traced back to the nearest
+     * infection mob targeting the victim.
      */
     private static LivingEntity resolveAttacker(ServerLevel level, LivingEntity victim, DamageSource source) {
         LivingEntity attacker = PhayriosisCompat.getAttacker(source);
@@ -132,19 +117,6 @@ public class HemolysisEventHandler {
         }
 
         return null;
-    }
-
-    /**
-     * The attacker's attack power, used as the reference for the 400% check. Scripted
-     * units sometimes deal damage that never shows up in the attribute, so the
-     * strongest hit observed in the streak is used as a fallback.
-     */
-    private static float attackPower(LivingEntity attacker, float strongestHit) {
-        float power = (float) attacker.getAttributeValue(Attributes.ATTACK_DAMAGE);
-        if (power <= 0.0F) {
-            power = strongestHit;
-        }
-        return power;
     }
 
     /**
@@ -174,9 +146,13 @@ public class HemolysisEventHandler {
     }
 
     /**
-     * Consecutive hits one attacker landed on one target, together with the damage
-     * that actually made it through the victim's mitigation.
+     * Attacks one attacker has landed on one target since the streak started.
+     *
+     * @param targetId    victim the streak belongs to
+     * @param hits        attacks landed on that victim so far
+     * @param firstHitTick game time of the first attack of the streak; the whole streak has to
+     *                     fit into {@code hemolysisStreakWindow} from here
      */
-    private record AttackStreak(UUID targetId, int hits, float totalDamage, float maxHit, long lastHitTick) {
+    private record AttackStreak(UUID targetId, int hits, long firstHitTick) {
     }
 }
