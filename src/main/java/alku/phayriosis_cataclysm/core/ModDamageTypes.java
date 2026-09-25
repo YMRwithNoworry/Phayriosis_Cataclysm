@@ -37,6 +37,14 @@ public final class ModDamageTypes {
      */
     public static final ResourceKey<DamageType> HOLY_INFECTION = key("holy_infection");
 
+    /**
+     * Meteor impact damage. Unlike {@link #HEMOLYSIS} this type is <em>not</em> registered in
+     * any {@code bypasses_*} tag: armour, enchantments and Resistance are meant to soften the
+     * blow, and absorption works normally. It is attributed to the Dreadmind that called the
+     * meteor down, so the kill is credited and the {@code meteor.player} death message is used.
+     */
+    public static final ResourceKey<DamageType> METEOR = key("meteor");
+
     private ModDamageTypes() {
     }
 

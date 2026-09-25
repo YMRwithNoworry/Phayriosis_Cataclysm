@@ -13,9 +13,12 @@
     "death.attack.infection.player": "%1$s was consumed by the infection whilst fighting %2$s",
     "death.attack.hemolysis": "%1$s bled out from hemolysis",
     "death.attack.hemolysis.player": "%1$s bled out from hemolysis whilst fighting %2$s",
+    "death.attack.meteor": "%1$s was crushed by a meteor",
+    "death.attack.meteor.player": "%1$s was crushed by a meteor whilst fighting %2$s",
     "phayriosis_cataclysm.stage_advance": "Infection Stage: %d",
     "phayriosis_cataclysm.biomass": "Biomass: %.1f",
     "phayriosis_cataclysm.carapace_active": "Adaptive Carapace Active: %s resistance",
     "effect.phayriosis_cataclysm.hemolysis": "Hemolysis",
-    "effect.phayriosis_cataclysm.holy": "Holy"
+    "effect.phayriosis_cataclysm.holy": "Holy",
+    "effect.phayriosis_cataclysm.stun": "Stun"
 }

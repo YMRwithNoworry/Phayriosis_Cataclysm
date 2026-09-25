@@ -13,9 +13,12 @@
     "death.attack.infection.player": "%1$s 在与 %2$s 的战斗中被感染吞噬了",
     "death.attack.hemolysis": "%1$s 因溶血而死亡",
     "death.attack.hemolysis.player": "%1$s 在与 %2$s 的战斗中因溶血而死亡",
+    "death.attack.meteor": "%1$s 被陨石砸死了",
+    "death.attack.meteor.player": "%1$s 在与 %2$s 的战斗中被陨石砸死了",
     "phayriosis_cataclysm.stage_advance": "感染阶段：%d",
     "phayriosis_cataclysm.biomass": "生物质：%.1f",
     "phayriosis_cataclysm.carapace_active": "自适应甲壳激活：%s 抗性",
     "effect.phayriosis_cataclysm.hemolysis": "溶血",
-    "effect.phayriosis_cataclysm.holy": "神圣"
+    "effect.phayriosis_cataclysm.holy": "神圣",
+    "effect.phayriosis_cataclysm.stun": "晕眩"
 }

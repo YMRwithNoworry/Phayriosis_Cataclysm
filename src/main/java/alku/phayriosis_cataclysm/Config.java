@@ -241,6 +241,81 @@ public class Config {
             .comment("Ticks the vulnerability stacks survive after the last holy hit (0 = never expire)")
             .defineInRange("holyVulnerabilityDuration", 600, 0, 72000);
 
+    // ========== Meteor Strike (Dreadmind) ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_METEOR_STRIKE = BUILDER
+            .comment("Whether Dreadminds periodically call a meteor down on enemy elite units")
+            .define("enableMeteorStrike", true);
+
+    public static final ForgeConfigSpec.IntValue METEOR_COOLDOWN = BUILDER
+            .comment("Ticks between two meteor strikes of the same Dreadmind (400 = 20 seconds)")
+            .defineInRange("meteorCooldown", 400, 20, 24000);
+
+    public static final ForgeConfigSpec.DoubleValue METEOR_SEARCH_RADIUS = BUILDER
+            .comment("Radius in blocks a Dreadmind looks for an enemy elite unit to bombard")
+            .defineInRange("meteorSearchRadius", 48.0, 4.0, 128.0);
+
+    public static final ForgeConfigSpec.DoubleValue METEOR_ELITE_MIN_HEALTH = BUILDER
+            .comment("A creature of another faction counts as an elite target when its maximum health",
+                    "is at least this (40 = iron golem / warden class). Players are never picked as the",
+                    "target, although they are still caught by the impact radius.")
+            .defineInRange("meteorEliteMinHealth", 40.0, 1.0, 2048.0);
+
+    public static final ForgeConfigSpec.DoubleValue METEOR_DAMAGE = BUILDER
+            .comment("Damage the impact deals to every enemy inside the impact radius.",
+                    "Armour, enchantments and Resistance still apply; PHA creatures are immune.")
+            .defineInRange("meteorDamage", 50.0, 0.0, 10000.0);
+
+    public static final ForgeConfigSpec.IntValue METEOR_STUN_DURATION = BUILDER
+            .comment("Ticks the Stun effect lasts (1000 = 50 seconds)")
+            .defineInRange("meteorStunDuration", 1000, 20, 72000);
+
+    public static final ForgeConfigSpec.DoubleValue METEOR_IMPACT_RADIUS = BUILDER
+            .comment("Radius in blocks of the impact: every non-PHA creature inside is hit and stunned")
+            .defineInRange("meteorImpactRadius", 4.0, 1.0, 32.0);
+
+    public static final ForgeConfigSpec.IntValue METEOR_FALL_HEIGHT = BUILDER
+            .comment("How many blocks above the target the meteor blocks spawn")
+            .defineInRange("meteorFallHeight", 40, 8, 200);
+
+    public static final ForgeConfigSpec.IntValue METEOR_BLOCK_COUNT = BUILDER
+            .comment("How many falling blocks one meteor is made of")
+            .defineInRange("meteorBlockCount", 16, 1, 64);
+
+    public static final ForgeConfigSpec.DoubleValue METEOR_SPREAD = BUILDER
+            .comment("Horizontal spread in blocks of the falling blocks around the target")
+            .defineInRange("meteorSpread", 3.0, 0.0, 16.0);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> METEOR_BLOCKS = BUILDER
+            .comment("Blocks a meteor is made of, by registry name (lava-like solids look best).",
+                    "Liquids and blocks with a block entity are skipped automatically.")
+            .defineList("meteorBlocks", List.of(
+                    "minecraft:magma_block",
+                    "minecraft:netherrack",
+                    "minecraft:blackstone",
+                    "minecraft:basalt",
+                    "minecraft:obsidian",
+                    "minecraft:cobbled_deepslate",
+                    "minecraft:tuff",
+                    "minecraft:gilded_blackstone",
+                    "minecraft:crying_obsidian",
+                    "minecraft:nether_bricks"), o -> o instanceof String);
+
+    public static final ForgeConfigSpec.IntValue METEOR_CRATER_RADIUS = BUILDER
+            .comment("Radius in blocks of the crater the impact carves into the ground (0 = no crater)")
+            .defineInRange("meteorCraterRadius", 2, 0, 8);
+
+    public static final ForgeConfigSpec.IntValue METEOR_CRATER_DEPTH = BUILDER
+            .comment("Depth in blocks of the crater (0 = no crater)")
+            .defineInRange("meteorCraterDepth", 2, 0, 8);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> METEOR_CRATER_BLACKLIST = BUILDER
+            .comment("Blocks a crater may never remove, by registry name. On top of this list the crater",
+                    "always skips air, fluids, unbreakable blocks and anything with a block entity.")
+            .defineList("meteorCraterBlacklist", List.of(
+                    "minecraft:bedrock",
+                    "minecraft:barrier",
+                    "minecraft:end_portal_frame"), o -> o instanceof String);
+
     // ========== Hemolysis ==========
     public static final ForgeConfigSpec.BooleanValue ENABLE_HEMOLYSIS = BUILDER
             .comment("Whether PHA creatures can inflict Hemolysis (溶血) on whatever they keep attacking")

@@ -21,6 +21,10 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 • Adaptive Carapace: High-tier infection mobs develop resistance to repeated damage types.
 • Hemolysis: Mobs that keep attacking a target their blows cannot hurt inject a stacking toxin
   that deals unresistable true damage every second.
+• Meteor Strike: every 20 seconds a Dreadmind calls a meteor of random molten blocks down on an
+  enemy elite unit (40+ max health). The impact deals 50 damage and stuns everything of another
+  faction inside its radius for 50 seconds, and leaves a shallow crater behind (all values
+  configurable: cooldown, elite health, damage, stun duration, block list, crater size).
 • Targeting Range: every PHA creature hunts with a 64 block sight range (configurable).
 • Holy Empowerment: every 30 seconds a Dreadmind blesses 3 nearby units - 150% attributes,
   golden aura, marked victims take growing PHA damage and all PHA damage against them is true
