@@ -21,6 +21,9 @@ An addon mod for Phayriosis Reborn that adds advanced infection mechanics:
 • Adaptive Carapace: High-tier infection mobs develop resistance to repeated damage types.
 • Hemolysis: Mobs that keep attacking a target their blows cannot hurt inject a stacking toxin
   that deals unresistable true damage every second.
+• Metamorphosis: every attack a low-tier PHA creature lands (under 40 max health) has a 30%
+  chance to turn the attacker into an abominable unit - humanoids into the Abominable Human,
+  beasts into the Abominable Bear, endermen and water creatures into their own abominable forms.
 • Meteor Strike: every 20 seconds a Dreadmind calls a meteor of random molten blocks down on an
   enemy elite unit (40+ max health). The impact deals 50 damage and stuns everything of another
   faction inside its radius for 50 seconds, and leaves a shallow crater behind (all values

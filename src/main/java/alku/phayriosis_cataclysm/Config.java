@@ -316,6 +316,40 @@ public class Config {
                     "minecraft:barrier",
                     "minecraft:end_portal_frame"), o -> o instanceof String);
 
+    // ========== Metamorphosis (low-tier self-transformation) ==========
+    public static final ForgeConfigSpec.BooleanValue ENABLE_METAMORPHOSIS = BUILDER
+            .comment("Whether low-tier PHA creatures can turn themselves into an Abominable unit the",
+                    "moment they attack")
+            .define("enableMetamorphosis", true);
+
+    public static final ForgeConfigSpec.DoubleValue METAMORPHOSIS_CHANCE = BUILDER
+            .comment("Chance per attack that a low-tier PHA creature morphs instead of staying what it",
+                    "is (0.3 = 30%). Rolled on every attack it lands; cancelled attacks do not count.")
+            .defineInRange("metamorphosisChance", 0.3, 0.0, 1.0);
+
+    public static final ForgeConfigSpec.DoubleValue METAMORPHOSIS_MAX_HEALTH = BUILDER
+            .comment("A PHA creature counts as low-tier while its maximum health is below this.",
+                    "An already abominable unit never morphs again, so the family cannot loop into",
+                    "itself, and Dreadminds/elites/bosses stay untouched.")
+            .defineInRange("metamorphosisMaxHealth", 40.0, 1.0, 2048.0);
+
+    public static final ForgeConfigSpec.ConfigValue<String> METAMORPHOSIS_HUMAN_RESULT = BUILDER
+            .comment("What a humanoid low-tier unit becomes - also the fallback for anything unclassified.",
+                    "Phayriosis 1.3.x ships this as phayriosis:abominable_human (Abominable Human).")
+            .define("metamorphosisHumanResult", "phayriosis:abominable_human");
+
+    public static final ForgeConfigSpec.ConfigValue<String> METAMORPHOSIS_BEAST_RESULT = BUILDER
+            .comment("What a low-tier quadruped (cow, pig, sheep, bear, horse, wolf, cat ...) becomes")
+            .define("metamorphosisBeastResult", "phayriosis:abominable_bear");
+
+    public static final ForgeConfigSpec.ConfigValue<String> METAMORPHOSIS_ENDERMAN_RESULT = BUILDER
+            .comment("What a low-tier enderman becomes")
+            .define("metamorphosisEndermanResult", "phayriosis:abominable_enderman");
+
+    public static final ForgeConfigSpec.ConfigValue<String> METAMORPHOSIS_AQUATIC_RESULT = BUILDER
+            .comment("What a low-tier water creature (fish, squid, dolphin, guardian ...) becomes")
+            .define("metamorphosisAquaticResult", "phayriosis:abominablefish");
+
     // ========== Hemolysis ==========
     public static final ForgeConfigSpec.BooleanValue ENABLE_HEMOLYSIS = BUILDER
             .comment("Whether PHA creatures can inflict Hemolysis (溶血) on whatever they keep attacking")
